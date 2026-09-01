@@ -1,8 +1,7 @@
 use crate::reg::Cast as _;
 
 pub trait MachineSpecificRegister
-where
-    Self: PartialEq + Eq,
+where Self: PartialEq + Eq
 {
     fn id(&self) -> u32;
 }
@@ -10,75 +9,75 @@ where
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash)]
 pub struct MSR(pub u32);
 
-impl From<u32> for MSR {
-    fn from(id: u32) -> Self {
+impl From<u32> for MSR
+{
+    fn from(id: u32) -> Self
+    {
         Self(id)
     }
 }
 
-impl MachineSpecificRegister for MSR {
-    fn id(&self) -> u32 {
+impl MachineSpecificRegister for MSR
+{
+    fn id(&self) -> u32
+    {
         self.0
     }
 }
 
 impl<T> crate::reg::Register<8> for T
-where
-    T: MachineSpecificRegister,
+where T: MachineSpecificRegister
 {
     type Inner = u64;
 
-    unsafe fn read(&self) -> Self::Inner {
+    unsafe fn read(&self) -> Self::Inner
+    {
         unsafe { crate::ins::rdmsr(self.id()) }
     }
 
-    unsafe fn write(&mut self, value: Self::Inner) {
+    unsafe fn write(&mut self, value: Self::Inner)
+    {
         unsafe {
             crate::ins::wrmsr(self.id(), value);
         }
     }
 
-    unsafe fn read_raw(&self) -> [u8; 8] {
+    unsafe fn read_raw(&self) -> [u8; 8]
+    {
         let value = unsafe { self.read() };
         value.cast()
     }
 
-    unsafe fn write_raw(&mut self, value: [u8; 8]) {
+    unsafe fn write_raw(&mut self, value: [u8; 8])
+    {
         unsafe {
             self.write(value.cast());
         }
     }
 
-    unsafe fn try_read(&self) -> Option<Self::Inner> {
-        if self.id() == u32::MAX {
-            return None;
-        }
+    unsafe fn try_read(&self) -> Option<Self::Inner>
+    {
         Some(unsafe { self.read() })
     }
 
-    unsafe fn try_write(&mut self, value: Self::Inner) -> Option<()> {
-        if self.id() == u32::MAX {
-            return None;
-        }
+    unsafe fn try_write(&mut self, value: Self::Inner) -> Option<()>
+    {
         Some(unsafe { self.write(value) })
     }
 
-    unsafe fn try_read_raw(&self) -> Option<[u8; 8]> {
-        if self.id() == u32::MAX {
-            return None;
-        }
+    unsafe fn try_read_raw(&self) -> Option<[u8; 8]>
+    {
         Some(unsafe { self.read_raw() })
     }
 
-    unsafe fn try_write_raw(&mut self, value: [u8; 8]) -> Option<()> {
-        if self.id() == u32::MAX {
-            return None;
-        }
+    unsafe fn try_write_raw(&mut self, value: [u8; 8]) -> Option<()>
+    {
         Some(unsafe { self.write_raw(value) })
     }
 }
 
-impl MSR {
+impl MSR
+{
     /// See Section 35.16, MSRs in Pentium Processors,  and see  Table 35-2.
     pub const P5_MC_ADDR: Self = Self(0x0);
 
@@ -91,7 +90,8 @@ impl MSR {
     /// See Section 35.16, MSRs in Pentium Processors.
     pub const IA32_P5_MC_TYPE: Self = Self(0x1);
 
-    /// See Section 8.10.5, Monitor/Mwait Address Range Determination,   and see Table 35-2.
+    /// See Section 8.10.5, Monitor/Mwait Address Range Determination,   and see
+    /// Table 35-2.
     pub const IA32_MONITOR_FILTER_SIZE: Self = Self(0x6);
 
     /// See Section 8.10.5, Monitor/Mwait Address  Range Determination.
@@ -106,28 +106,39 @@ impl MSR {
     /// Model Specific Platform ID (R)
     pub const MSR_PLATFORM_ID: Self = Self(0x17);
 
-    /// Platform ID (R)  See Table 35-2. The operating system can use this MSR to  determine slot  information for the processor and the proper microcode update to load.
+    /// Platform ID (R)  See Table 35-2. The operating system can use this MSR
+    /// to  determine slot  information for the processor and the proper
+    /// microcode update to load.
     pub const IA32_PLATFORM_ID: Self = Self(0x17);
 
     /// Section 10.4.4, Local APIC Status and Location.
     pub const APIC_BASE: Self = Self(0x1b);
 
-    /// APIC Location and Status (R/W) See Table 35-2. See Section 10.4.4, Local APIC  Status and Location.
+    /// APIC Location and Status (R/W) See Table 35-2. See Section 10.4.4, Local
+    /// APIC  Status and Location.
     pub const IA32_APIC_BASE: Self = Self(0x1b);
 
-    /// Processor Hard Power-On Configuration  (R/W) Enables and disables processor features);  (R) indicates current processor configuration.
+    /// Processor Hard Power-On Configuration  (R/W) Enables and disables
+    /// processor features);  (R) indicates current processor configuration.
     pub const EBL_CR_POWERON: Self = Self(0x2a);
 
-    /// Processor Hard Power-On Configuration (R/W) Enables and  disables processor features);  (R) indicates current processor configuration.
+    /// Processor Hard Power-On Configuration (R/W) Enables and  disables
+    /// processor features);  (R) indicates current processor configuration.
     pub const MSR_EBL_CR_POWERON: Self = Self(0x2a);
 
-    /// Processor Hard Power-On Configuration (R/W) Enables and disables processor features);  (R) indicates current processor configuration.
+    /// Processor Hard Power-On Configuration (R/W) Enables and disables
+    /// processor features);  (R) indicates current processor configuration.
     pub const MSR_EBC_HARD_POWERON: Self = Self(0x2a);
 
-    /// Processor Soft Power-On Configuration (R/W)  Enables and disables processor features.
+    /// Processor Soft Power-On Configuration (R/W)  Enables and disables
+    /// processor features.
     pub const MSR_EBC_SOFT_POWERON: Self = Self(0x2b);
 
-    /// Processor Frequency Configuration The bit field layout of this MSR varies according to  the MODEL value in the CPUID version  information. The following bit field layout applies to Pentium 4 and Xeon Processors with MODEL  encoding equal or greater than 2.  (R) The field Indicates the current processor  frequency configuration.
+    /// Processor Frequency Configuration The bit field layout of this MSR
+    /// varies according to  the MODEL value in the CPUID version  information.
+    /// The following bit field layout applies to Pentium 4 and Xeon Processors
+    /// with MODEL  encoding equal or greater than 2.  (R) The field Indicates
+    /// the current processor  frequency configuration.
     pub const MSR_EBC_FREQUENCY_ID: Self = Self(0x2c);
 
     /// Test Control Register
@@ -136,73 +147,98 @@ impl MSR {
     /// SMI Counter (R/O)
     pub const MSR_SMI_COUNT: Self = Self(0x34);
 
-    /// Control Features in IA-32 Processor (R/W) See Table 35-2 (If CPUID.01H:ECX.\[bit 5\])
+    /// Control Features in IA-32 Processor (R/W) See Table 35-2 (If
+    /// CPUID.01H:ECX.\[bit 5\])
     pub const IA32_FEATURE_CONTROL: Self = Self(0x3a);
 
     /// Per-Logical-Processor TSC ADJUST (R/W) See Table 35-2.
     pub const IA32_TSC_ADJUST: Self = Self(0x3b);
 
-    /// Last Branch Record 0 From IP (R/W) One of eight pairs of last branch record registers on the last branch  record stack. This part of the stack contains pointers to the source  instruction for one of the last eight branches, exceptions, or  interrupts taken by the processor. See also: Last Branch Record Stack TOS at 1C9H Section 17.11, Last Branch, Interrupt, and Exception Recording  (Pentium M Processors).
+    /// Last Branch Record 0 From IP (R/W) One of eight pairs of last branch
+    /// record registers on the last branch  record stack. This part of the
+    /// stack contains pointers to the source  instruction for one of the last
+    /// eight branches, exceptions, or  interrupts taken by the processor. See
+    /// also: Last Branch Record Stack TOS at 1C9H Section 17.11, Last Branch,
+    /// Interrupt, and Exception Recording  (Pentium M Processors).
     pub const MSR_LASTBRANCH_0_FROM_IP: Self = Self(0x40);
 
     /// Last Branch Record 1 (R/W) See description of MSR_LASTBRANCH_0.
     pub const MSR_LASTBRANCH_1: Self = Self(0x41);
 
-    /// Last Branch Record 1 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 1 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_1_FROM_IP: Self = Self(0x41);
 
-    /// Last Branch Record 2 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 2 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_2_FROM_IP: Self = Self(0x42);
 
-    /// Last Branch Record 3 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 3 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_3_FROM_IP: Self = Self(0x43);
 
     /// Last Branch Record 4 (R/W) See description of MSR_LASTBRANCH_0.
     pub const MSR_LASTBRANCH_4: Self = Self(0x44);
 
-    /// Last Branch Record 4 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 4 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_4_FROM_IP: Self = Self(0x44);
 
     /// Last Branch Record 5 (R/W) See description of MSR_LASTBRANCH_0.
     pub const MSR_LASTBRANCH_5: Self = Self(0x45);
 
-    /// Last Branch Record 5 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 5 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_5_FROM_IP: Self = Self(0x45);
 
     /// Last Branch Record 6 (R/W) See description of MSR_LASTBRANCH_0.
     pub const MSR_LASTBRANCH_6: Self = Self(0x46);
 
-    /// Last Branch Record 6 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 6 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_6_FROM_IP: Self = Self(0x46);
 
     /// Last Branch Record 7 (R/W) See description of MSR_LASTBRANCH_0.
     pub const MSR_LASTBRANCH_7: Self = Self(0x47);
 
-    /// Last Branch Record 7 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 7 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_7_FROM_IP: Self = Self(0x47);
 
-    /// Last Branch Record 0 (R/W)  One of 16 pairs of last branch record registers on  the last branch record stack (6C0H-6CFH). This  part of the stack contains pointers to the  destination instruction for one of the last 16  branches, exceptions, or interrupts that the  processor took. See Section 17.9, Last Branch, Interrupt, and  Exception Recording (Processors based on Intel  NetBurst® Microarchitecture).
+    /// Last Branch Record 0 (R/W)  One of 16 pairs of last branch record
+    /// registers on  the last branch record stack (6C0H-6CFH). This  part of
+    /// the stack contains pointers to the  destination instruction for one of
+    /// the last 16  branches, exceptions, or interrupts that the  processor
+    /// took. See Section 17.9, Last Branch, Interrupt, and  Exception Recording
+    /// (Processors based on Intel  NetBurst® Microarchitecture).
     pub const MSR_LASTBRANCH_0_TO_IP: Self = Self(0x6c0);
 
-    /// Last Branch Record 1 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 1 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_1_TO_IP: Self = Self(0x61);
 
-    /// Last Branch Record 2 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 2 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_2_TO_IP: Self = Self(0x62);
 
-    /// Last Branch Record 3 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 3 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_3_TO_IP: Self = Self(0x63);
 
-    /// Last Branch Record 4 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 4 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_4_TO_IP: Self = Self(0x64);
 
-    /// Last Branch Record 5 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 5 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_5_TO_IP: Self = Self(0x65);
 
-    /// Last Branch Record 6 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 6 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_6_TO_IP: Self = Self(0x66);
 
-    /// Last Branch Record 7 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 7 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_7_TO_IP: Self = Self(0x67);
 
     /// BIOS Update Trigger Register (W)  See Table 35-2.
@@ -220,7 +256,9 @@ impl MSR {
     /// If IA32_VMX_MISC\[bit 15\])
     pub const IA32_SMBASE: Self = Self(0x9e);
 
-    /// System Management Mode Physical Address Mask register  (WO in SMM) Model-specific implementation of SMRR-like interface, read visible  and write only in SMM..
+    /// System Management Mode Physical Address Mask register  (WO in SMM)
+    /// Model-specific implementation of SMRR-like interface, read visible  and
+    /// write only in SMM..
     pub const MSR_SMRR_PHYSMASK: Self = Self(0xa1);
 
     /// Performance Counter Register  See Table 35-2.
@@ -247,7 +285,8 @@ impl MSR {
     /// Performance Counter Register  See Table 35-2.
     pub const IA32_PMC7: Self = Self(0xc8);
 
-    /// Scaleable Bus Speed(RO) This field indicates the intended scaleable bus clock speed for  processors based on Intel Atom microarchitecture:
+    /// Scaleable Bus Speed(RO) This field indicates the intended scaleable bus
+    /// clock speed for  processors based on Intel Atom microarchitecture:
     pub const MSR_FSB_FREQ: Self = Self(0xcd);
 
     /// see http://biosbits.org.
@@ -272,22 +311,29 @@ impl MSR {
 
     pub const MSR_BBL_CR_CTL3: Self = Self(0x11e);
 
-    /// TSX Ctrl Register for TSX Async Abot (TAA) Migration. See Volume 3A, Section 2.1, Table 2-2.
+    /// TSX Ctrl Register for TSX Async Abot (TAA) Migration. See Volume 3A,
+    /// Section 2.1, Table 2-2.
     pub const MSR_IA32_TSX_CTRL: Self = Self(0x122);
 
-    /// CS register target for CPL 0 code (R/W) See Table 35-2. See Section 5.8.7, Performing Fast Calls to  System Procedures with the SYSENTER and  SYSEXIT Instructions.
+    /// CS register target for CPL 0 code (R/W) See Table 35-2. See Section
+    /// 5.8.7, Performing Fast Calls to  System Procedures with the SYSENTER and
+    /// SYSEXIT Instructions.
     pub const IA32_SYSENTER_CS: Self = Self(0x174);
 
     /// CS register target for CPL 0 code
     pub const SYSENTER_CS_MSR: Self = Self(0x174);
 
-    /// Stack pointer for CPL 0 stack (R/W) See Table 35-2. See Section 5.8.7, Performing Fast Calls to  System Procedures with the SYSENTER and  SYSEXIT Instructions.
+    /// Stack pointer for CPL 0 stack (R/W) See Table 35-2. See Section 5.8.7,
+    /// Performing Fast Calls to  System Procedures with the SYSENTER and
+    /// SYSEXIT Instructions.
     pub const IA32_SYSENTER_ESP: Self = Self(0x175);
 
     /// Stack pointer for CPL 0 stack
     pub const SYSENTER_ESP_MSR: Self = Self(0x175);
 
-    /// CPL 0 code entry point (R/W) See Table 35-2. See Section 5.8.7, Performing  Fast Calls to System Procedures with the SYSENTER and SYSEXIT Instructions.
+    /// CPL 0 code entry point (R/W) See Table 35-2. See Section 5.8.7,
+    /// Performing  Fast Calls to System Procedures with the SYSENTER and
+    /// SYSEXIT Instructions.
     pub const IA32_SYSENTER_EIP: Self = Self(0x176);
 
     /// CPL 0 code entry point
@@ -295,65 +341,83 @@ impl MSR {
 
     pub const MCG_CAP: Self = Self(0x179);
 
-    /// Machine Check Capabilities (R) See Table 35-2. See Section 15.3.1.1,  IA32_MCG_CAP MSR.
+    /// Machine Check Capabilities (R) See Table 35-2. See Section 15.3.1.1,
+    /// IA32_MCG_CAP MSR.
     pub const IA32_MCG_CAP: Self = Self(0x179);
 
-    /// Machine Check Status. (R) See Table 35-2. See Section 15.3.1.2,  IA32_MCG_STATUS MSR.
+    /// Machine Check Status. (R) See Table 35-2. See Section 15.3.1.2,
+    /// IA32_MCG_STATUS MSR.
     pub const IA32_MCG_STATUS: Self = Self(0x17a);
 
     pub const MCG_STATUS: Self = Self(0x17a);
 
     pub const MCG_CTL: Self = Self(0x17b);
 
-    /// Machine Check Feature Enable (R/W) See Table 35-2. See Section 15.3.1.3, IA32_MCG_CTL MSR.
+    /// Machine Check Feature Enable (R/W) See Table 35-2. See Section 15.3.1.3,
+    /// IA32_MCG_CTL MSR.
     pub const IA32_MCG_CTL: Self = Self(0x17b);
 
-    /// Enhanced SMM Capabilities (SMM-RO) Reports SMM capability Enhancement. Accessible only while in  SMM.
+    /// Enhanced SMM Capabilities (SMM-RO) Reports SMM capability Enhancement.
+    /// Accessible only while in  SMM.
     pub const MSR_SMM_MCA_CAP: Self = Self(0x17d);
 
     /// MC Bank Error Configuration (R/W)
     pub const MSR_ERROR_CONTROL: Self = Self(0x17f);
 
-    /// Machine Check EAX/RAX Save State See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check EAX/RAX Save State See Section 15.3.2.6, IA32_MCG Extended
+    /// Machine Check State MSRs.
     pub const MSR_MCG_RAX: Self = Self(0x180);
 
-    /// Machine Check EBX/RBX Save State See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check EBX/RBX Save State See Section 15.3.2.6, IA32_MCG Extended
+    /// Machine Check State MSRs.
     pub const MSR_MCG_RBX: Self = Self(0x181);
 
-    /// Machine Check ECX/RCX Save State See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check ECX/RCX Save State See Section 15.3.2.6, IA32_MCG Extended
+    /// Machine Check State MSRs.
     pub const MSR_MCG_RCX: Self = Self(0x182);
 
-    /// Machine Check EDX/RDX Save State See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check EDX/RDX Save State See Section 15.3.2.6, IA32_MCG Extended
+    /// Machine Check State MSRs.
     pub const MSR_MCG_RDX: Self = Self(0x183);
 
-    /// Machine Check ESI/RSI Save State See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check ESI/RSI Save State See Section 15.3.2.6, IA32_MCG Extended
+    /// Machine Check State MSRs.
     pub const MSR_MCG_RSI: Self = Self(0x184);
 
-    /// Machine Check EDI/RDI Save State See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check EDI/RDI Save State See Section 15.3.2.6, IA32_MCG Extended
+    /// Machine Check State MSRs.
     pub const MSR_MCG_RDI: Self = Self(0x185);
 
-    /// Machine Check EBP/RBP Save State See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check EBP/RBP Save State See Section 15.3.2.6, IA32_MCG Extended
+    /// Machine Check State MSRs.
     pub const MSR_MCG_RBP: Self = Self(0x186);
 
-    /// Performance Event Select for Counter 0 (R/W) Supports all fields described inTable 35-2 and the fields below.
+    /// Performance Event Select for Counter 0 (R/W) Supports all fields
+    /// described inTable 35-2 and the fields below.
     pub const IA32_PERFEVTSEL0: Self = Self(0x186);
 
-    /// Performance Event Select for Counter 1 (R/W) Supports all fields described inTable 35-2 and the fields below.
+    /// Performance Event Select for Counter 1 (R/W) Supports all fields
+    /// described inTable 35-2 and the fields below.
     pub const IA32_PERFEVTSEL1: Self = Self(0x187);
 
-    /// Performance Event Select for Counter 2 (R/W) Supports all fields described inTable 35-2 and the fields below.
+    /// Performance Event Select for Counter 2 (R/W) Supports all fields
+    /// described inTable 35-2 and the fields below.
     pub const IA32_PERFEVTSEL2: Self = Self(0x188);
 
-    /// Machine Check EFLAGS/RFLAG Save State See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check EFLAGS/RFLAG Save State See Section 15.3.2.6, IA32_MCG
+    /// Extended  Machine Check State MSRs.
     pub const MSR_MCG_RFLAGS: Self = Self(0x188);
 
-    /// Performance Event Select for Counter 3 (R/W) Supports all fields described inTable 35-2 and the fields below.
+    /// Performance Event Select for Counter 3 (R/W) Supports all fields
+    /// described inTable 35-2 and the fields below.
     pub const IA32_PERFEVTSEL3: Self = Self(0x189);
 
-    /// Machine Check EIP/RIP Save State See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check EIP/RIP Save State See Section 15.3.2.6, IA32_MCG Extended
+    /// Machine Check State MSRs.
     pub const MSR_MCG_RIP: Self = Self(0x189);
 
-    /// Machine Check Miscellaneous See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check Miscellaneous See Section 15.3.2.6, IA32_MCG Extended
+    /// Machine Check State MSRs.
     pub const MSR_MCG_MISC: Self = Self(0x18a);
 
     /// See Table 35-2); If CPUID.0AH:EAX\[15:8\] = 8
@@ -368,25 +432,32 @@ impl MSR {
     /// See Table 35-2); If CPUID.0AH:EAX\[15:8\] = 8
     pub const IA32_PERFEVTSEL7: Self = Self(0x18d);
 
-    /// Machine Check R8 See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check R8 See Section 15.3.2.6, IA32_MCG Extended  Machine Check
+    /// State MSRs.
     pub const MSR_MCG_R8: Self = Self(0x190);
 
-    /// Machine Check R9D/R9 See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check R9D/R9 See Section 15.3.2.6, IA32_MCG Extended  Machine
+    /// Check State MSRs.
     pub const MSR_MCG_R9: Self = Self(0x191);
 
-    /// Machine Check R10 See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check R10 See Section 15.3.2.6, IA32_MCG Extended  Machine Check
+    /// State MSRs.
     pub const MSR_MCG_R10: Self = Self(0x192);
 
-    /// Machine Check R11 See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check R11 See Section 15.3.2.6, IA32_MCG Extended  Machine Check
+    /// State MSRs.
     pub const MSR_MCG_R11: Self = Self(0x193);
 
-    /// Machine Check R12 See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check R12 See Section 15.3.2.6, IA32_MCG Extended  Machine Check
+    /// State MSRs.
     pub const MSR_MCG_R12: Self = Self(0x194);
 
-    /// Machine Check R13 See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check R13 See Section 15.3.2.6, IA32_MCG Extended  Machine Check
+    /// State MSRs.
     pub const MSR_MCG_R13: Self = Self(0x195);
 
-    /// Machine Check R14 See Section 15.3.2.6, IA32_MCG Extended  Machine Check State MSRs.
+    /// Machine Check R14 See Section 15.3.2.6, IA32_MCG Extended  Machine Check
+    /// State MSRs.
     pub const MSR_MCG_R14: Self = Self(0x196);
 
     pub const MSR_PERF_STATUS: Self = Self(0x198);
@@ -397,13 +468,16 @@ impl MSR {
     /// See Table 35-2. See Section 14.1, Enhanced Intel  Speedstep® Technology.
     pub const IA32_PERF_CTL: Self = Self(0x199);
 
-    /// Clock Modulation (R/W)  See Table 35-2. IA32_CLOCK_MODULATION MSR was originally named  IA32_THERM_CONTROL MSR.
+    /// Clock Modulation (R/W)  See Table 35-2. IA32_CLOCK_MODULATION MSR was
+    /// originally named  IA32_THERM_CONTROL MSR.
     pub const IA32_CLOCK_MODULATION: Self = Self(0x19a);
 
-    /// Thermal Interrupt Control (R/W) See Section 14.5.2, Thermal Monitor,  and see Table 35-2.
+    /// Thermal Interrupt Control (R/W) See Section 14.5.2, Thermal Monitor,
+    /// and see Table 35-2.
     pub const IA32_THERM_INTERRUPT: Self = Self(0x19b);
 
-    /// Thermal Monitor Status (R/W) See Section 14.5.2, Thermal Monitor,  and see  Table 35-2.
+    /// Thermal Monitor Status (R/W) See Section 14.5.2, Thermal Monitor,  and
+    /// see  Table 35-2.
     pub const IA32_THERM_STATUS: Self = Self(0x19c);
 
     /// Thermal Monitor 2 Control.
@@ -428,7 +502,8 @@ impl MSR {
     /// See http://biosbits.org.
     pub const MSR_TURBO_POWER_CURRENT_LIMIT: Self = Self(0x1ac);
 
-    /// Maximum Ratio Limit of Turbo Mode RO if MSR_PLATFORM_INFO.\[28\] = 0, RW if MSR_PLATFORM_INFO.\[28\] = 1
+    /// Maximum Ratio Limit of Turbo Mode RO if MSR_PLATFORM_INFO.\[28\] = 0, RW
+    /// if MSR_PLATFORM_INFO.\[28\] = 1
     pub const MSR_TURBO_RATIO_LIMIT: Self = Self(0x1ad);
 
     /// if CPUID.6H:ECX\[3\] = 1
@@ -440,44 +515,72 @@ impl MSR {
     /// If CPUID.06H: EAX\[6\] = 1
     pub const IA32_PACKAGE_THERM_INTERRUPT: Self = Self(0x1b2);
 
-    /// Last Branch Record Filtering Select Register (R/W)  See Section 17.6.2, Filtering of Last Branch Records.
+    /// Last Branch Record Filtering Select Register (R/W)  See Section 17.6.2,
+    /// Filtering of Last Branch Records.
     pub const MSR_LBR_SELECT: Self = Self(0x1c8);
 
-    /// Last Branch Record Stack TOS (R/W)  Contains an index (0-3 or 0-15) that points to the  top of the last branch record stack (that is, that points the index of the MSR containing the most  recent branch record). See Section 17.9.2, LBR Stack for Processors Based on Intel NetBurst® Microarchitecture ); and  addresses 1DBH-1DEH and 680H-68FH.
+    /// Last Branch Record Stack TOS (R/W)  Contains an index (0-3 or 0-15) that
+    /// points to the  top of the last branch record stack (that is, that points
+    /// the index of the MSR containing the most  recent branch record). See
+    /// Section 17.9.2, LBR Stack for Processors Based on Intel NetBurst®
+    /// Microarchitecture ); and  addresses 1DBH-1DEH and 680H-68FH.
     pub const MSR_LASTBRANCH_TOS: Self = Self(0x1da);
 
     pub const DEBUGCTLMSR: Self = Self(0x1d9);
 
-    /// Debug Control (R/W)  Controls how several debug features are used. Bit  definitions are discussed in the referenced section. See Section 17.9.1, MSR_DEBUGCTLA MSR.
+    /// Debug Control (R/W)  Controls how several debug features are used. Bit
+    /// definitions are discussed in the referenced section. See Section 17.9.1,
+    /// MSR_DEBUGCTLA MSR.
     pub const MSR_DEBUGCTLA: Self = Self(0x1d9);
 
-    /// Debug Control (R/W)  Controls how several debug features are used. Bit definitions are discussed in the referenced section. See Section 17.11, Last Branch, Interrupt, and Exception Recording  (Pentium M Processors).
+    /// Debug Control (R/W)  Controls how several debug features are used. Bit
+    /// definitions are discussed in the referenced section. See Section 17.11,
+    /// Last Branch, Interrupt, and Exception Recording  (Pentium M Processors).
     pub const MSR_DEBUGCTLB: Self = Self(0x1d9);
 
-    /// Debug Control (R/W)  Controls how several debug features are used. Bit definitions are  discussed in the referenced section.
+    /// Debug Control (R/W)  Controls how several debug features are used. Bit
+    /// definitions are  discussed in the referenced section.
     pub const IA32_DEBUGCTL: Self = Self(0x1d9);
 
     pub const LASTBRANCHFROMIP: Self = Self(0x1db);
 
-    /// Last Branch Record 0 (R/W)  One of four last branch record registers on the last  branch record stack. It contains pointers to the  source and destination instruction for one of the  last four branches, exceptions, or interrupts that  the processor took. MSR_LASTBRANCH_0 through  MSR_LASTBRANCH_3 at 1DBH-1DEH are  available only on family 0FH, models 0H-02H.  They have been replaced by the MSRs at 680H- 68FH and 6C0H-6CFH.
+    /// Last Branch Record 0 (R/W)  One of four last branch record registers on
+    /// the last  branch record stack. It contains pointers to the  source and
+    /// destination instruction for one of the  last four branches, exceptions,
+    /// or interrupts that  the processor took. MSR_LASTBRANCH_0 through
+    /// MSR_LASTBRANCH_3 at 1DBH-1DEH are  available only on family 0FH, models
+    /// 0H-02H.  They have been replaced by the MSRs at 680H- 68FH and
+    /// 6C0H-6CFH.
     pub const MSR_LASTBRANCH_0: Self = Self(0x1db);
 
     pub const LASTBRANCHTOIP: Self = Self(0x1dc);
 
     pub const LASTINTFROMIP: Self = Self(0x1dd);
 
-    /// Last Branch Record 2 See description of the MSR_LASTBRANCH_0 MSR at 1DBH.
+    /// Last Branch Record 2 See description of the MSR_LASTBRANCH_0 MSR at
+    /// 1DBH.
     pub const MSR_LASTBRANCH_2: Self = Self(0x1dd);
 
-    /// Last Exception Record From Linear IP (R)  Contains a pointer to the last branch instruction that the processor  executed prior to the last exception that was generated or the last  interrupt that was handled. See Section 17.11, Last Branch, Interrupt, and Exception Recording  (Pentium M Processors)  and Section 17.12.2, Last Branch and Last  Exception MSRs.
+    /// Last Exception Record From Linear IP (R)  Contains a pointer to the last
+    /// branch instruction that the processor  executed prior to the last
+    /// exception that was generated or the last  interrupt that was handled.
+    /// See Section 17.11, Last Branch, Interrupt, and Exception Recording
+    /// (Pentium M Processors)  and Section 17.12.2, Last Branch and Last
+    /// Exception MSRs.
     pub const MSR_LER_FROM_LIP: Self = Self(0x1de);
 
     pub const LASTINTTOIP: Self = Self(0x1de);
 
-    /// Last Branch Record 3 See description of the MSR_LASTBRANCH_0 MSR  at 1DBH.
+    /// Last Branch Record 3 See description of the MSR_LASTBRANCH_0 MSR  at
+    /// 1DBH.
     pub const MSR_LASTBRANCH_3: Self = Self(0x1de);
 
-    /// Last Exception Record To Linear IP (R)  This area contains a pointer to the target of the last branch instruction  that the processor executed prior to the last exception that was  generated or the last interrupt that was handled. See Section 17.11, Last Branch, Interrupt, and Exception Recording  (Pentium M Processors)  and Section 17.12.2, Last Branch and Last  Exception MSRs.
+    /// Last Exception Record To Linear IP (R)  This area contains a pointer to
+    /// the target of the last branch instruction  that the processor executed
+    /// prior to the last exception that was  generated or the last interrupt
+    /// that was handled. See Section 17.11, Last Branch, Interrupt, and
+    /// Exception Recording  (Pentium M Processors)  and Section 17.12.2, Last
+    /// Branch and Last  Exception MSRs.
     pub const MSR_LER_TO_LIP: Self = Self(0x1dd);
 
     pub const ROB_CR_BKUPTMPDR6: Self = Self(0x1e0);
@@ -664,7 +767,9 @@ impl MSR {
     /// See Table 35-2.
     pub const IA32_MC21_CTL2: Self = Self(0x295);
 
-    /// Default Memory Types (R/W)  Sets the memory type for the regions of physical memory that are not  mapped by the MTRRs.  See Section 11.11.2.1, IA32_MTRR_DEF_TYPE MSR.
+    /// Default Memory Types (R/W)  Sets the memory type for the regions of
+    /// physical memory that are not  mapped by the MTRRs.  See Section
+    /// 11.11.2.1, IA32_MTRR_DEF_TYPE MSR.
     pub const IA32_MTRR_DEF_TYPE: Self = Self(0x2ff);
 
     /// See Section 18.12.2, Performance Counters.
@@ -732,7 +837,8 @@ impl MSR {
     /// See Table 35-2. See Section 17.4.1, IA32_DEBUGCTL MSR.
     pub const IA32_PERF_CAPABILITIES: Self = Self(0x345);
 
-    /// RO. This applies to processors that do not support architectural  perfmon version 2.
+    /// RO. This applies to processors that do not support architectural
+    /// perfmon version 2.
     pub const MSR_PERF_CAPABILITIES: Self = Self(0x345);
 
     /// See Section 18.12.3, CCCR MSRs.
@@ -813,22 +919,26 @@ impl MSR {
     /// See Table 35-2. See Section 18.4.2, Global Counter Control  Facilities.
     pub const IA32_PERF_GLOBAL_OVF_CTRL: Self = Self(0x390);
 
-    /// See Section 18.7.2.1, Uncore Performance Monitoring  Management Facility.
+    /// See Section 18.7.2.1, Uncore Performance Monitoring  Management
+    /// Facility.
     pub const MSR_UNCORE_PERF_GLOBAL_CTRL: Self = Self(0x391);
 
     /// Uncore PMU global control
     pub const MSR_UNC_PERF_GLOBAL_CTRL: Self = Self(0x391);
 
-    /// See Section 18.7.2.1, Uncore Performance Monitoring  Management Facility.
+    /// See Section 18.7.2.1, Uncore Performance Monitoring  Management
+    /// Facility.
     pub const MSR_UNCORE_PERF_GLOBAL_STATUS: Self = Self(0x392);
 
     /// Uncore PMU main status
     pub const MSR_UNC_PERF_GLOBAL_STATUS: Self = Self(0x392);
 
-    /// See Section 18.7.2.1, Uncore Performance Monitoring  Management Facility.
+    /// See Section 18.7.2.1, Uncore Performance Monitoring  Management
+    /// Facility.
     pub const MSR_UNCORE_PERF_GLOBAL_OVF_CTRL: Self = Self(0x393);
 
-    /// See Section 18.7.2.1, Uncore Performance Monitoring  Management Facility.
+    /// See Section 18.7.2.1, Uncore Performance Monitoring  Management
+    /// Facility.
     pub const MSR_UNCORE_FIXED_CTR0: Self = Self(0x394);
 
     /// Uncore W-box perfmon fixed counter
@@ -837,7 +947,8 @@ impl MSR {
     /// Uncore fixed counter control (R/W)
     pub const MSR_UNC_PERF_FIXED_CTRL: Self = Self(0x394);
 
-    /// See Section 18.7.2.1, Uncore Performance Monitoring  Management Facility.
+    /// See Section 18.7.2.1, Uncore Performance Monitoring  Management
+    /// Facility.
     pub const MSR_UNCORE_FIXED_CTR_CTRL: Self = Self(0x395);
 
     /// Uncore U-box perfmon fixed counter control MSR
@@ -968,10 +1079,14 @@ impl MSR {
     /// See Section 18.12.1, ESCR MSRs.
     pub const MSR_CRU_ESCR1: Self = Self(0x3b9);
 
-    /// See Section 18.12.1, ESCR MSRs. This MSR is not available on later processors. It is  only available on processor family 0FH, models  01H-02H.
+    /// See Section 18.12.1, ESCR MSRs. This MSR is not available on later
+    /// processors. It is  only available on processor family 0FH, models
+    /// 01H-02H.
     pub const MSR_IQ_ESCR0: Self = Self(0x3ba);
 
-    /// See Section 18.12.1, ESCR MSRs. This MSR is not available on later processors. It is  only available on processor family 0FH, models  01H-02H.
+    /// See Section 18.12.1, ESCR MSRs. This MSR is not available on later
+    /// processors. It is  only available on processor family 0FH, models
+    /// 01H-02H.
     pub const MSR_IQ_ESCR1: Self = Self(0x3bb);
 
     /// See Section 18.12.1, ESCR MSRs.
@@ -1048,7 +1163,8 @@ impl MSR {
 
     pub const IA32_PEBS_ENABLE: Self = Self(0x3f1);
 
-    /// Precise Event-Based Sampling (PEBS) (R/W)  Controls the enabling of precise event sampling  and replay tagging.
+    /// Precise Event-Based Sampling (PEBS) (R/W)  Controls the enabling of
+    /// precise event sampling  and replay tagging.
     pub const MSR_PEBS_ENABLE: Self = Self(0x3f1);
 
     /// See Table 19-26.
@@ -1057,34 +1173,47 @@ impl MSR {
     /// see See Section 18.7.1.2, Load Latency Performance Monitoring  Facility.
     pub const MSR_PEBS_LD_LAT: Self = Self(0x3f6);
 
-    /// Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C- States.
+    /// Note: C-state values are processor specific C-state code names,
+    /// unrelated to MWAIT extension C-state parameters or ACPI C- States.
     pub const MSR_PKG_C3_RESIDENCY: Self = Self(0x3f8);
 
-    /// Package C2 Residency Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C-States
+    /// Package C2 Residency Note: C-state values are processor specific C-state
+    /// code names,  unrelated to MWAIT extension C-state parameters or ACPI
+    /// C-States
     pub const MSR_PKG_C2_RESIDENCY: Self = Self(0x3f8);
 
-    /// Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C- States.
+    /// Note: C-state values are processor specific C-state code names,
+    /// unrelated to MWAIT extension C-state parameters or ACPI C- States.
     pub const MSR_PKG_C6C_RESIDENCY: Self = Self(0x3f9);
 
-    /// Package C4 Residency Note: C-state values are processor specific C-state code names, unrelated to MWAIT extension C-state parameters or ACPI C-States
+    /// Package C4 Residency Note: C-state values are processor specific C-state
+    /// code names, unrelated to MWAIT extension C-state parameters or ACPI
+    /// C-States
     pub const MSR_PKG_C4_RESIDENCY: Self = Self(0x3f9);
 
-    /// Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C- States.
+    /// Note: C-state values are processor specific C-state code names,
+    /// unrelated to MWAIT extension C-state parameters or ACPI C- States.
     pub const MSR_PKG_C7_RESIDENCY: Self = Self(0x3fa);
 
-    /// Package C6 Residency Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C-States
+    /// Package C6 Residency Note: C-state values are processor specific C-state
+    /// code names,  unrelated to MWAIT extension C-state parameters or ACPI
+    /// C-States
     pub const MSR_PKG_C6_RESIDENCY: Self = Self(0x3fa);
 
-    /// Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C- States.
+    /// Note: C-state values are processor specific C-state code names,
+    /// unrelated to MWAIT extension C-state parameters or ACPI C- States.
     pub const MSR_CORE_C3_RESIDENCY: Self = Self(0x3fc);
 
-    /// Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C- States.
+    /// Note: C-state values are processor specific C-state code names,
+    /// unrelated to MWAIT extension C-state parameters or ACPI C- States.
     pub const MSR_CORE_C4_RESIDENCY: Self = Self(0x3fc);
 
-    /// Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C- States.
+    /// Note: C-state values are processor specific C-state code names,
+    /// unrelated to MWAIT extension C-state parameters or ACPI C- States.
     pub const MSR_CORE_C6_RESIDENCY: Self = Self(0x3fd);
 
-    /// Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C- States.
+    /// Note: C-state values are processor specific C-state code names,
+    /// unrelated to MWAIT extension C-state parameters or ACPI C- States.
     pub const MSR_CORE_C7_RESIDENCY: Self = Self(0x3fe);
 
     pub const MC0_CTL: Self = Self(0x400);
@@ -1102,13 +1231,22 @@ impl MSR {
     /// P6 Family Processors
     pub const IA32_MC0_ADDR1: Self = Self(0x402);
 
-    /// See Section 14.3.2.3., IA32_MCi_ADDR MSRs .  The IA32_MC0_ADDR register is either not implemented or contains no address if the ADDRV flag in the IA32_MC0_STATUS register is clear.  When not implemented in the processor, all reads and writes to this MSR  will cause a general-protection exception.
+    /// See Section 14.3.2.3., IA32_MCi_ADDR MSRs .  The IA32_MC0_ADDR register
+    /// is either not implemented or contains no address if the ADDRV flag in
+    /// the IA32_MC0_STATUS register is clear.  When not implemented in the
+    /// processor, all reads and writes to this MSR  will cause a
+    /// general-protection exception.
     pub const IA32_MC0_ADDR: Self = Self(0x402);
 
-    /// Defined in MCA architecture but not implemented in the P6 family  processors.
+    /// Defined in MCA architecture but not implemented in the P6 family
+    /// processors.
     pub const MC0_MISC: Self = Self(0x403);
 
-    /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs. The IA32_MC0_MISC MSR is either not  implemented or does not contain additional  information if the MISCV flag in the  IA32_MC0_STATUS register is clear. When not implemented in the processor, all reads  and writes to this MSR will cause a general- protection exception.
+    /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs. The IA32_MC0_MISC MSR is
+    /// either not  implemented or does not contain additional  information if
+    /// the MISCV flag in the  IA32_MC0_STATUS register is clear. When not
+    /// implemented in the processor, all reads  and writes to this MSR will
+    /// cause a general- protection exception.
     pub const IA32_MC0_MISC: Self = Self(0x403);
 
     /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs.
@@ -1130,13 +1268,22 @@ impl MSR {
     /// P6 Family Processors
     pub const IA32_MC1_ADDR2: Self = Self(0x406);
 
-    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The IA32_MC1_ADDR register is either not implemented or  contains no address if the ADDRV flag in the IA32_MC1_STATUS  register is clear.  When not implemented in the processor, all reads and writes to this  MSR will cause a general-protection exception.
+    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The IA32_MC1_ADDR register is
+    /// either not implemented or  contains no address if the ADDRV flag in the
+    /// IA32_MC1_STATUS  register is clear.  When not implemented in the
+    /// processor, all reads and writes to this  MSR will cause a
+    /// general-protection exception.
     pub const IA32_MC1_ADDR: Self = Self(0x406);
 
-    /// Defined in MCA architecture but not implemented in the P6 family  processors.
+    /// Defined in MCA architecture but not implemented in the P6 family
+    /// processors.
     pub const MC1_MISC: Self = Self(0x407);
 
-    /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs. The IA32_MC1_MISC MSR is either not  implemented or does not contain additional  information if the MISCV flag in the  IA32_MC1_STATUS register is clear. When not implemented in the processor, all reads  and writes to this MSR will cause a general- protection exception.
+    /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs. The IA32_MC1_MISC MSR is
+    /// either not  implemented or does not contain additional  information if
+    /// the MISCV flag in the  IA32_MC1_STATUS register is clear. When not
+    /// implemented in the processor, all reads  and writes to this MSR will
+    /// cause a general- protection exception.
     pub const IA32_MC1_MISC: Self = Self(0x407);
 
     /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs.
@@ -1158,13 +1305,22 @@ impl MSR {
     /// P6 Family Processors
     pub const IA32_MC2_ADDR1: Self = Self(0x40a);
 
-    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The IA32_MC2_ADDR register is either not  implemented or contains no address if the ADDRV  flag in the IA32_MC2_STATUS register is clear.  When not implemented in the processor, all reads  and writes to this MSR will cause a general- protection exception.
+    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The IA32_MC2_ADDR register is
+    /// either not  implemented or contains no address if the ADDRV  flag in the
+    /// IA32_MC2_STATUS register is clear.  When not implemented in the
+    /// processor, all reads  and writes to this MSR will cause a general-
+    /// protection exception.
     pub const IA32_MC2_ADDR: Self = Self(0x40a);
 
-    /// Defined in MCA architecture but not implemented in the P6 family  processors.
+    /// Defined in MCA architecture but not implemented in the P6 family
+    /// processors.
     pub const MC2_MISC: Self = Self(0x40b);
 
-    /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs. The IA32_MC2_MISC MSR is either not  implemented or does not contain additional  information if the MISCV flag in the IA32_MC2_STATUS register is clear.  When not implemented in the processor, all reads  and writes to this MSR will cause a general- protection exception.
+    /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs. The IA32_MC2_MISC MSR is
+    /// either not  implemented or does not contain additional  information if
+    /// the MISCV flag in the IA32_MC2_STATUS register is clear.  When not
+    /// implemented in the processor, all reads  and writes to this MSR will
+    /// cause a general- protection exception.
     pub const IA32_MC2_MISC: Self = Self(0x40b);
 
     /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs.
@@ -1178,7 +1334,8 @@ impl MSR {
     /// See Section 15.3.2.1,  IA32_MCi_CTL MSRs.
     pub const MSR_MC4_CTL: Self = Self(0x40c);
 
-    /// Bit definitions same as MC0_STATUS, except bits 0, 4, 57, and 61 are  hardcoded to 1.
+    /// Bit definitions same as MC0_STATUS, except bits 0, 4, 57, and 61 are
+    /// hardcoded to 1.
     pub const MC4_STATUS: Self = Self(0x40d);
 
     /// See Section 15.3.2.2, IA32_MCi_STATUS MSRS,  and Chapter 16.
@@ -1193,16 +1350,29 @@ impl MSR {
     /// P6 Family Processors
     pub const IA32_MC3_ADDR1: Self = Self(0x40e);
 
-    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The IA32_MC3_ADDR register is either not  implemented or contains no address if the ADDRV  flag in the IA32_MC3_STATUS register is clear. When not implemented in the processor, all reads  and writes to this MSR will cause a general- protection exception.
+    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The IA32_MC3_ADDR register is
+    /// either not  implemented or contains no address if the ADDRV  flag in the
+    /// IA32_MC3_STATUS register is clear. When not implemented in the
+    /// processor, all reads  and writes to this MSR will cause a general-
+    /// protection exception.
     pub const IA32_MC3_ADDR: Self = Self(0x40e);
 
-    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The MSR_MC4_ADDR register is either not implemented or  contains no address if the ADDRV flag in the MSR_MC4_STATUS  register is clear. When not implemented in the processor, all reads and writes to this  MSR will cause a general-protection exception.
+    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The MSR_MC4_ADDR register is
+    /// either not implemented or  contains no address if the ADDRV flag in the
+    /// MSR_MC4_STATUS  register is clear. When not implemented in the
+    /// processor, all reads and writes to this  MSR will cause a
+    /// general-protection exception.
     pub const MSR_MC4_ADDR: Self = Self(0x412);
 
-    /// Defined in MCA architecture but not implemented in the P6 family  processors.
+    /// Defined in MCA architecture but not implemented in the P6 family
+    /// processors.
     pub const MC4_MISC: Self = Self(0x40f);
 
-    /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs. The IA32_MC3_MISC MSR is either not  implemented or does not contain additional  information if the MISCV flag in the  IA32_MC3_STATUS register is clear. When not implemented in the processor, all reads  and writes to this MSR will cause a general- protection exception.
+    /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs. The IA32_MC3_MISC MSR is
+    /// either not  implemented or does not contain additional  information if
+    /// the MISCV flag in the  IA32_MC3_STATUS register is clear. When not
+    /// implemented in the processor, all reads  and writes to this MSR will
+    /// cause a general- protection exception.
     pub const IA32_MC3_MISC: Self = Self(0x40f);
 
     pub const MC3_CTL: Self = Self(0x410);
@@ -1227,19 +1397,32 @@ impl MSR {
     /// P6 Family Processors
     pub const IA32_MC4_ADDR1: Self = Self(0x412);
 
-    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The IA32_MC2_ADDR register is either not  implemented or contains no address if the ADDRV  flag in the IA32_MC4_STATUS register is clear.  When not implemented in the processor, all reads  and writes to this MSR will cause a general- protection exception.
+    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The IA32_MC2_ADDR register is
+    /// either not  implemented or contains no address if the ADDRV  flag in the
+    /// IA32_MC4_STATUS register is clear.  When not implemented in the
+    /// processor, all reads  and writes to this MSR will cause a general-
+    /// protection exception.
     pub const IA32_MC4_ADDR: Self = Self(0x412);
 
-    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The MSR_MC3_ADDR register is either not implemented or  contains no address if the ADDRV flag in the MSR_MC3_STATUS register is clear.  When not implemented in the processor, all reads and writes to this  MSR will cause a general-protection exception.
+    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The MSR_MC3_ADDR register is
+    /// either not implemented or  contains no address if the ADDRV flag in the
+    /// MSR_MC3_STATUS register is clear.  When not implemented in the
+    /// processor, all reads and writes to this  MSR will cause a
+    /// general-protection exception.
     pub const MSR_MC3_ADDR: Self = Self(0x412);
 
     /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs.
     pub const MSR_MC3_MISC: Self = Self(0x40f);
 
-    /// Defined in MCA architecture but not implemented in the P6 family  processors.
+    /// Defined in MCA architecture but not implemented in the P6 family
+    /// processors.
     pub const MC3_MISC: Self = Self(0x413);
 
-    /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs.   The IA32_MC2_MISC MSR is either not  implemented or does not contain additional  information if the MISCV flag in the  IA32_MC4_STATUS register is clear.  When not implemented in the processor, all reads  and writes to this MSR will cause a general- protection exception.
+    /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs.   The IA32_MC2_MISC MSR is
+    /// either not  implemented or does not contain additional  information if
+    /// the MISCV flag in the  IA32_MC4_STATUS register is clear.  When not
+    /// implemented in the processor, all reads  and writes to this MSR will
+    /// cause a general- protection exception.
     pub const IA32_MC4_MISC: Self = Self(0x413);
 
     /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs.
@@ -1257,7 +1440,11 @@ impl MSR {
     /// 06_0FH
     pub const IA32_MC5_STATUS: Self = Self(0x415);
 
-    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The MSR_MC4_ADDR register is either not implemented or  contains no address if the ADDRV flag in the MSR_MC4_STATUS  register is clear. When not implemented in the processor, all reads and writes to this  MSR will cause a general-protection exception.
+    /// See Section 15.3.2.3, IA32_MCi_ADDR MSRs. The MSR_MC4_ADDR register is
+    /// either not implemented or  contains no address if the ADDRV flag in the
+    /// MSR_MC4_STATUS  register is clear. When not implemented in the
+    /// processor, all reads and writes to this  MSR will cause a
+    /// general-protection exception.
     pub const MSR_MC5_ADDR: Self = Self(0x416);
 
     /// 06_0FH
@@ -1278,7 +1465,8 @@ impl MSR {
     /// 06_1DH
     pub const IA32_MC6_STATUS: Self = Self(0x419);
 
-    /// Apply to Intel Xeon processor 7400 series (processor signature  06_1D) only. See Section 15.3.2.2, IA32_MCi_STATUS MSRS.  and  Chapter 23.
+    /// Apply to Intel Xeon processor 7400 series (processor signature  06_1D)
+    /// only. See Section 15.3.2.2, IA32_MCi_STATUS MSRS.  and  Chapter 23.
     pub const MSR_MC6_STATUS: Self = Self(0x419);
 
     /// 06_1DH
@@ -1713,67 +1901,88 @@ impl MSR {
     /// See Section 15.3.2.4,  IA32_MCi_MISC MSRs.
     pub const MSR_MC26_MISC: Self = Self(0x46b);
 
-    /// Reporting Register of Basic VMX Capabilities (R/O) See Table 35-2. See Appendix A.1, Basic VMX Information (If CPUID.01H:ECX.\[bit 9\])
+    /// Reporting Register of Basic VMX Capabilities (R/O) See Table 35-2. See
+    /// Appendix A.1, Basic VMX Information (If CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_BASIC: Self = Self(0x480);
 
-    /// Capability Reporting Register of Pin-based VM-execution  Controls (R/O) See Appendix A.3, VM-Execution Controls (If CPUID.01H:ECX.\[bit 9\])
+    /// Capability Reporting Register of Pin-based VM-execution  Controls (R/O)
+    /// See Appendix A.3, VM-Execution Controls (If CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_PINBASED_CTLS: Self = Self(0x481);
 
-    /// Capability Reporting Register of Primary Processor-based  VM-execution Controls (R/O) See Appendix A.3, VM-Execution Controls (If CPUID.01H:ECX.\[bit 9\])
+    /// Capability Reporting Register of Primary Processor-based  VM-execution
+    /// Controls (R/O) See Appendix A.3, VM-Execution Controls (If
+    /// CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_PROCBASED_CTLS: Self = Self(0x482);
 
-    /// Capability Reporting Register of VM-exit Controls (R/O) See Appendix A.4, VM-Exit Controls (If CPUID.01H:ECX.\[bit 9\])
+    /// Capability Reporting Register of VM-exit Controls (R/O) See Appendix
+    /// A.4, VM-Exit Controls (If CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_EXIT_CTLS: Self = Self(0x483);
 
-    /// Capability Reporting Register of VM-entry Controls (R/O) See Appendix A.5, VM-Entry Controls (If CPUID.01H:ECX.\[bit 9\])
+    /// Capability Reporting Register of VM-entry Controls (R/O) See Appendix
+    /// A.5, VM-Entry Controls (If CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_ENTRY_CTLS: Self = Self(0x484);
 
-    /// Reporting Register of Miscellaneous VMX Capabilities (R/O) See Appendix A.6, Miscellaneous Data (If CPUID.01H:ECX.\[bit 9\])
+    /// Reporting Register of Miscellaneous VMX Capabilities (R/O) See Appendix
+    /// A.6, Miscellaneous Data (If CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_MISC: Self = Self(0x485);
 
-    /// Capability Reporting Register of CR0 Bits Fixed to 0 (R/O) See Appendix A.7, VMX-Fixed Bits in CR0 (If CPUID.01H:ECX.\[bit 9\])
+    /// Capability Reporting Register of CR0 Bits Fixed to 0 (R/O) See Appendix
+    /// A.7, VMX-Fixed Bits in CR0 (If CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_CR0_FIXED0: Self = Self(0x486);
 
     /// If CPUID.01H:ECX.\[bit 5\] = 1
     pub const IA32_VMX_CRO_FIXED0: Self = Self(0x486);
 
-    /// Capability Reporting Register of CR0 Bits Fixed to 1 (R/O) See Appendix A.7, VMX-Fixed Bits in CR0 (If CPUID.01H:ECX.\[bit 9\])
+    /// Capability Reporting Register of CR0 Bits Fixed to 1 (R/O) See Appendix
+    /// A.7, VMX-Fixed Bits in CR0 (If CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_CR0_FIXED1: Self = Self(0x487);
 
     /// If CPUID.01H:ECX.\[bit 5\] = 1
     pub const IA32_VMX_CRO_FIXED1: Self = Self(0x487);
 
-    /// Capability Reporting Register of CR4 Bits Fixed to 0 (R/O) See Appendix A.8, VMX-Fixed Bits in CR4 (If CPUID.01H:ECX.\[bit 9\])
+    /// Capability Reporting Register of CR4 Bits Fixed to 0 (R/O) See Appendix
+    /// A.8, VMX-Fixed Bits in CR4 (If CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_CR4_FIXED0: Self = Self(0x488);
 
-    /// Capability Reporting Register of CR4 Bits Fixed to 1 (R/O) See Appendix A.8, VMX-Fixed Bits in CR4 (If CPUID.01H:ECX.\[bit 9\])
+    /// Capability Reporting Register of CR4 Bits Fixed to 1 (R/O) See Appendix
+    /// A.8, VMX-Fixed Bits in CR4 (If CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_CR4_FIXED1: Self = Self(0x489);
 
-    /// Capability Reporting Register of VMCS Field Enumeration (R/O) See Appendix A.9, VMCS Enumeration (If CPUID.01H:ECX.\[bit 9\])
+    /// Capability Reporting Register of VMCS Field Enumeration (R/O) See
+    /// Appendix A.9, VMCS Enumeration (If CPUID.01H:ECX.\[bit 9\])
     pub const IA32_VMX_VMCS_ENUM: Self = Self(0x48a);
 
-    /// Capability Reporting Register of Secondary Processor-based  VM-execution Controls (R/O) See Appendix A.3, VM-Execution Controls (If CPUID.01H:ECX.\[bit 9\] and  IA32_VMX_PROCBASED_CTLS\[bit 63\])
+    /// Capability Reporting Register of Secondary Processor-based  VM-execution
+    /// Controls (R/O) See Appendix A.3, VM-Execution Controls (If
+    /// CPUID.01H:ECX.\[bit 9\] and  IA32_VMX_PROCBASED_CTLS\[bit 63\])
     pub const IA32_VMX_PROCBASED_CTLS2: Self = Self(0x48b);
 
     /// Capability Reporting Register of EPT and VPID (R/O)  See Table 35-2
     pub const IA32_VMX_EPT_VPID_ENUM: Self = Self(0x48c);
 
-    /// If ( CPUID.01H:ECX.\[bit 5\],  IA32_VMX_PROCBASED_C TLS\[bit 63\], and either  IA32_VMX_PROCBASED_C TLS2\[bit 33\] or  IA32_VMX_PROCBASED_C TLS2\[bit 37\])
+    /// If ( CPUID.01H:ECX.\[bit 5\],  IA32_VMX_PROCBASED_C TLS\[bit 63\], and
+    /// either  IA32_VMX_PROCBASED_C TLS2\[bit 33\] or  IA32_VMX_PROCBASED_C
+    /// TLS2\[bit 37\])
     pub const IA32_VMX_EPT_VPID_CAP: Self = Self(0x48c);
 
-    /// Capability Reporting Register of Pin-based VM-execution Flex  Controls (R/O) See Table 35-2
+    /// Capability Reporting Register of Pin-based VM-execution Flex  Controls
+    /// (R/O) See Table 35-2
     pub const IA32_VMX_TRUE_PINBASED_CTLS: Self = Self(0x48d);
 
-    /// Capability Reporting Register of Primary Processor-based  VM-execution Flex Controls (R/O) See Table 35-2
+    /// Capability Reporting Register of Primary Processor-based  VM-execution
+    /// Flex Controls (R/O) See Table 35-2
     pub const IA32_VMX_TRUE_PROCBASED_CTLS: Self = Self(0x48e);
 
-    /// Capability Reporting Register of VM-exit Flex Controls (R/O) See Table 35-2
+    /// Capability Reporting Register of VM-exit Flex Controls (R/O) See Table
+    /// 35-2
     pub const IA32_VMX_TRUE_EXIT_CTLS: Self = Self(0x48f);
 
-    /// Capability Reporting Register of VM-entry Flex Controls (R/O) See Table 35-2
+    /// Capability Reporting Register of VM-entry Flex Controls (R/O) See Table
+    /// 35-2
     pub const IA32_VMX_TRUE_ENTRY_CTLS: Self = Self(0x490);
 
-    /// Capability Reporting Register of VM-function Controls (R/O) See Table 35-2
+    /// Capability Reporting Register of VM-function Controls (R/O) See Table
+    /// 35-2
     pub const IA32_VMX_FMFUNC: Self = Self(0x491);
 
     /// If( CPUID.01H:ECX.\[bit 5\] =  1 and IA32_VMX_BASIC\[bit 55\] )
@@ -1803,13 +2012,17 @@ impl MSR {
     /// (If CPUID.0AH: EAX\[15:8\] >  7) & IA32_PERF_CAPABILITIES\[ 13\] = 1
     pub const IA32_A_PMC7: Self = Self(0x4c8);
 
-    /// Enhanced SMM Feature Control (SMM-RW) Reports SMM capability Enhancement. Accessible only while in  SMM.
+    /// Enhanced SMM Feature Control (SMM-RW) Reports SMM capability
+    /// Enhancement. Accessible only while in  SMM.
     pub const MSR_SMM_FEATURE_CONTROL: Self = Self(0x4e0);
 
-    /// SMM Delayed (SMM-RO) Reports the interruptible state of all logical processors in the  package . Available only while in SMM and  MSR_SMM_MCA_CAP\[LONG_FLOW_INDICATION\] == 1.
+    /// SMM Delayed (SMM-RO) Reports the interruptible state of all logical
+    /// processors in the  package . Available only while in SMM and
+    /// MSR_SMM_MCA_CAP\[LONG_FLOW_INDICATION\] == 1.
     pub const MSR_SMM_DELAYED: Self = Self(0x4e2);
 
-    /// SMM Blocked (SMM-RO) Reports the blocked state of all logical processors in the package .  Available only while in SMM.
+    /// SMM Blocked (SMM-RO) Reports the blocked state of all logical processors
+    /// in the package .  Available only while in SMM.
     pub const MSR_SMM_BLOCKED: Self = Self(0x4e3);
 
     /// Trace Output Base Register (R/W)
@@ -1851,22 +2064,40 @@ impl MSR {
     /// Trace End Address 4
     pub const MSR_IA32_ADDR3_END: Self = Self(0x587);
 
-    /// DS Save Area (R/W) See Table 35-2. Points to the DS buffer management area, which is used to manage the  BTS and PEBS buffers. See Section 18.12.4, Debug Store (DS)  Mechanism.
+    /// DS Save Area (R/W) See Table 35-2. Points to the DS buffer management
+    /// area, which is used to manage the  BTS and PEBS buffers. See Section
+    /// 18.12.4, Debug Store (DS)  Mechanism.
     pub const IA32_DS_AREA: Self = Self(0x600);
 
-    /// Unit Multipliers used in RAPL Interfaces (R/O)  See Section 14.7.1, RAPL Interfaces.
+    /// Unit Multipliers used in RAPL Interfaces (R/O)  See Section 14.7.1, RAPL
+    /// Interfaces.
     pub const MSR_RAPL_POWER_UNIT: Self = Self(0x606);
 
-    /// Package C3 Interrupt Response Limit (R/W)  Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C- States.
+    /// Package C3 Interrupt Response Limit (R/W)  Note: C-state values are
+    /// processor specific C-state code names,  unrelated to MWAIT extension
+    /// C-state parameters or ACPI C- States.
     pub const MSR_PKGC3_IRTL: Self = Self(0x60a);
 
-    /// Package C6 Interrupt Response Limit (R/W)  This MSR defines the budget allocated for the package to exit from  C6 to a C0 state, where interrupt request can be delivered to the  core and serviced. Additional core-exit latency amy be applicable  depending on the actual C-state the core is in.  Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C- States.
+    /// Package C6 Interrupt Response Limit (R/W)  This MSR defines the budget
+    /// allocated for the package to exit from  C6 to a C0 state, where
+    /// interrupt request can be delivered to the  core and serviced. Additional
+    /// core-exit latency amy be applicable  depending on the actual C-state the
+    /// core is in.  Note: C-state values are processor specific C-state code
+    /// names,  unrelated to MWAIT extension C-state parameters or ACPI C-
+    /// States.
     pub const MSR_PKGC6_IRTL: Self = Self(0x60b);
 
-    /// Package C7 Interrupt Response Limit (R/W)  This MSR defines the budget allocated for the package to exit from  C7 to a C0 state, where interrupt request can be delivered to the  core and serviced. Additional core-exit latency amy be applicable  depending on the actual C-state the core is in.  Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C-States.
+    /// Package C7 Interrupt Response Limit (R/W)  This MSR defines the budget
+    /// allocated for the package to exit from  C7 to a C0 state, where
+    /// interrupt request can be delivered to the  core and serviced. Additional
+    /// core-exit latency amy be applicable  depending on the actual C-state the
+    /// core is in.  Note: C-state values are processor specific C-state code
+    /// names,  unrelated to MWAIT extension C-state parameters or ACPI
+    /// C-States.
     pub const MSR_PKGC7_IRTL: Self = Self(0x60c);
 
-    /// PKG RAPL Power Limit Control (R/W)  See Section 14.7.3, Package RAPL Domain.
+    /// PKG RAPL Power Limit Control (R/W)  See Section 14.7.3, Package RAPL
+    /// Domain.
     pub const MSR_PKG_POWER_LIMIT: Self = Self(0x610);
 
     /// PKG Energy Status (R/O)  See Section 14.7.3, Package RAPL Domain.
@@ -1878,25 +2109,30 @@ impl MSR {
     /// PKG RAPL Parameters (R/W) See Section 14.7.3,  Package RAPL  Domain.
     pub const MSR_PKG_POWER_INFO: Self = Self(0x614);
 
-    /// DRAM RAPL Power Limit Control (R/W)  See Section 14.7.5, DRAM RAPL Domain.
+    /// DRAM RAPL Power Limit Control (R/W)  See Section 14.7.5, DRAM RAPL
+    /// Domain.
     pub const MSR_DRAM_POWER_LIMIT: Self = Self(0x618);
 
     /// DRAM Energy Status (R/O)  See Section 14.7.5, DRAM RAPL Domain.
     pub const MSR_DRAM_ENERGY_STATUS: Self = Self(0x619);
 
-    /// DRAM Performance Throttling Status (R/O) See Section 14.7.5,  DRAM RAPL Domain.
+    /// DRAM Performance Throttling Status (R/O) See Section 14.7.5,  DRAM RAPL
+    /// Domain.
     pub const MSR_DRAM_PERF_STATUS: Self = Self(0x61b);
 
     /// DRAM RAPL Parameters (R/W) See Section 14.7.5, DRAM RAPL Domain.
     pub const MSR_DRAM_POWER_INFO: Self = Self(0x61c);
 
-    /// Note: C-state values are processor specific C-state code names, unrelated to MWAIT extension C-state parameters or ACPI C-States.
+    /// Note: C-state values are processor specific C-state code names,
+    /// unrelated to MWAIT extension C-state parameters or ACPI C-States.
     pub const MSR_PKG_C9_RESIDENCY: Self = Self(0x631);
 
-    /// Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C-States.
+    /// Note: C-state values are processor specific C-state code names,
+    /// unrelated to MWAIT extension C-state parameters or ACPI C-States.
     pub const MSR_PKG_C10_RESIDENCY: Self = Self(0x632);
 
-    /// PP0 RAPL Power Limit Control (R/W)  See Section 14.7.4, PP0/PP1 RAPL Domains.
+    /// PP0 RAPL Power Limit Control (R/W)  See Section 14.7.4, PP0/PP1 RAPL
+    /// Domains.
     pub const MSR_PP0_POWER_LIMIT: Self = Self(0x638);
 
     /// PP0 Energy Status (R/O)  See Section 14.7.4, PP0/PP1 RAPL Domains.
@@ -1905,10 +2141,12 @@ impl MSR {
     /// PP0 Balance Policy (R/W)  See Section 14.7.4, PP0/PP1 RAPL Domains.
     pub const MSR_PP0_POLICY: Self = Self(0x63a);
 
-    /// PP0 Performance Throttling Status (R/O) See Section 14.7.4,  PP0/PP1 RAPL Domains.
+    /// PP0 Performance Throttling Status (R/O) See Section 14.7.4,  PP0/PP1
+    /// RAPL Domains.
     pub const MSR_PP0_PERF_STATUS: Self = Self(0x63b);
 
-    /// PP1 RAPL Power Limit Control (R/W)  See Section 14.7.4, PP0/PP1 RAPL Domains.
+    /// PP1 RAPL Power Limit Control (R/W)  See Section 14.7.4, PP0/PP1 RAPL
+    /// Domains.
     pub const MSR_PP1_POWER_LIMIT: Self = Self(0x640);
 
     /// PP1 Energy Status (R/O)  See Section 14.7.4, PP0/PP1 RAPL Domains.
@@ -1932,55 +2170,72 @@ impl MSR {
     /// ConfigTDP Control (R/W)
     pub const MSR_TURBO_ACTIVATION_RATIO: Self = Self(0x64c);
 
-    /// Note: C-state values are processor specific C-state code names,  unrelated to MWAIT extension C-state parameters or ACPI C- States.
+    /// Note: C-state values are processor specific C-state code names,
+    /// unrelated to MWAIT extension C-state parameters or ACPI C- States.
     pub const MSR_CORE_C1_RESIDENCY: Self = Self(0x660);
 
-    /// Last Branch Record 8 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 8 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_8_FROM_IP: Self = Self(0x688);
 
-    /// Last Branch Record 9 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 9 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_9_FROM_IP: Self = Self(0x689);
 
-    /// Last Branch Record 10 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 10 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_10_FROM_IP: Self = Self(0x68a);
 
-    /// Last Branch Record 11 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 11 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_11_FROM_IP: Self = Self(0x68b);
 
-    /// Last Branch Record 12 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 12 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_12_FROM_IP: Self = Self(0x68c);
 
-    /// Last Branch Record 13 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 13 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_13_FROM_IP: Self = Self(0x68d);
 
-    /// Last Branch Record 14 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 14 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_14_FROM_IP: Self = Self(0x68e);
 
-    /// Last Branch Record 15 From IP (R/W) See description of MSR_LASTBRANCH_0_FROM_IP.
+    /// Last Branch Record 15 From IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_FROM_IP.
     pub const MSR_LASTBRANCH_15_FROM_IP: Self = Self(0x68f);
 
-    /// Last Branch Record 8 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 8 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_8_TO_IP: Self = Self(0x6c8);
 
-    /// Last Branch Record 9 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 9 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_9_TO_IP: Self = Self(0x6c9);
 
-    /// Last Branch Record 10 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 10 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_10_TO_IP: Self = Self(0x6ca);
 
-    /// Last Branch Record 11 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 11 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_11_TO_IP: Self = Self(0x6cb);
 
-    /// Last Branch Record 12 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 12 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_12_TO_IP: Self = Self(0x6cc);
 
-    /// Last Branch Record 13 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 13 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_13_TO_IP: Self = Self(0x6cd);
 
-    /// Last Branch Record 14 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 14 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_14_TO_IP: Self = Self(0x6ce);
 
-    /// Last Branch Record 15 To IP (R/W) See description of MSR_LASTBRANCH_0_TO_IP.
+    /// Last Branch Record 15 To IP (R/W) See description of
+    /// MSR_LASTBRANCH_0_TO_IP.
     pub const MSR_LASTBRANCH_15_TO_IP: Self = Self(0x6cf);
 
     /// TSC Target of Local APIC s TSC Deadline Mode (R/W)  See Table 35-2
@@ -3171,55 +3426,77 @@ impl MSR {
     /// Uncore C-box 9 perfmon counter MSR.
     pub const MSR_C9_PMON_CTR5: Self = Self(0xfdb);
 
-    /// GBUSQ Event Control and Counter  Register (R/W) See Section 18.17, Performance  Monitoring on 64-bit Intel Xeon Processor MP with Up to 8-MByte L3 Cache.
+    /// GBUSQ Event Control and Counter  Register (R/W) See Section 18.17,
+    /// Performance  Monitoring on 64-bit Intel Xeon Processor MP with Up to
+    /// 8-MByte L3 Cache.
     pub const MSR_EMON_L3_CTR_CTL0: Self = Self(0x107cc);
 
-    /// IFSB BUSQ Event Control and Counter  Register (R/W) See Section 18.17, Performance  Monitoring on 64-bit Intel Xeon Processor  MP with Up to 8-MByte L3 Cache.
+    /// IFSB BUSQ Event Control and Counter  Register (R/W) See Section 18.17,
+    /// Performance  Monitoring on 64-bit Intel Xeon Processor  MP with Up to
+    /// 8-MByte L3 Cache.
     pub const MSR_IFSB_BUSQ0: Self = Self(0x107cc);
 
-    /// GBUSQ Event Control/Counter Register (R/W) Apply to Intel Xeon processor 7400 series (processor signature  06_1D) only. See Section 17.2.2
+    /// GBUSQ Event Control/Counter Register (R/W) Apply to Intel Xeon processor
+    /// 7400 series (processor signature  06_1D) only. See Section 17.2.2
     pub const MSR_EMON_L3_CTR_CTL1: Self = Self(0x107cd);
 
     /// IFSB BUSQ Event Control and Counter Register (R/W)
     pub const MSR_IFSB_BUSQ1: Self = Self(0x107cd);
 
-    /// GSNPQ Event Control and Counter  Register (R/W)  See Section 18.17, Performance Monitoring on 64-bit Intel Xeon Processor MP with Up to 8-MByte L3 Cache.
+    /// GSNPQ Event Control and Counter  Register (R/W)  See Section 18.17,
+    /// Performance Monitoring on 64-bit Intel Xeon Processor MP with Up to
+    /// 8-MByte L3 Cache.
     pub const MSR_EMON_L3_CTR_CTL2: Self = Self(0x107ce);
 
-    /// IFSB SNPQ Event Control and Counter  Register (R/W)  See Section 18.17, Performance  Monitoring on 64-bit Intel Xeon Processor  MP with Up to 8-MByte L3 Cache.
+    /// IFSB SNPQ Event Control and Counter  Register (R/W)  See Section 18.17,
+    /// Performance  Monitoring on 64-bit Intel Xeon Processor  MP with Up to
+    /// 8-MByte L3 Cache.
     pub const MSR_IFSB_SNPQ0: Self = Self(0x107ce);
 
-    /// GSNPQ Event Control/Counter Register (R/W) Apply to Intel Xeon processor 7400 series (processor signature  06_1D) only. See Section 17.2.2
+    /// GSNPQ Event Control/Counter Register (R/W) Apply to Intel Xeon processor
+    /// 7400 series (processor signature  06_1D) only. See Section 17.2.2
     pub const MSR_EMON_L3_CTR_CTL3: Self = Self(0x107cf);
 
     /// IFSB SNPQ Event Control and Counter  Register (R/W)
     pub const MSR_IFSB_SNPQ1: Self = Self(0x107cf);
 
-    /// EFSB DRDY Event Control and Counter Register (R/W)  See Section 18.17, Performance  Monitoring on 64-bit Intel Xeon Processor MP with Up to 8-MByte L3 Cache  for  details.
+    /// EFSB DRDY Event Control and Counter Register (R/W)  See Section 18.17,
+    /// Performance  Monitoring on 64-bit Intel Xeon Processor MP with Up to
+    /// 8-MByte L3 Cache  for  details.
     pub const MSR_EFSB_DRDY0: Self = Self(0x107d0);
 
-    /// FSB Event Control and Counter Register (R/W)  See Section 18.17, Performance  Monitoring on 64-bit Intel Xeon Processor MP with Up to 8-MByte L3 Cache  for  details.
+    /// FSB Event Control and Counter Register (R/W)  See Section 18.17,
+    /// Performance  Monitoring on 64-bit Intel Xeon Processor MP with Up to
+    /// 8-MByte L3 Cache  for  details.
     pub const MSR_EMON_L3_CTR_CTL4: Self = Self(0x107d0);
 
     /// EFSB DRDY Event Control and Counter  Register (R/W)
     pub const MSR_EFSB_DRDY1: Self = Self(0x107d1);
 
-    /// FSB Event Control/Counter Register (R/W) Apply to Intel Xeon processor 7400 series (processor signature  06_1D) only. See Section 17.2.2
+    /// FSB Event Control/Counter Register (R/W) Apply to Intel Xeon processor
+    /// 7400 series (processor signature  06_1D) only. See Section 17.2.2
     pub const MSR_EMON_L3_CTR_CTL5: Self = Self(0x107d1);
 
-    /// FSB Event Control/Counter Register (R/W) Apply to Intel Xeon processor 7400 series (processor signature  06_1D) only. See Section 17.2.2
+    /// FSB Event Control/Counter Register (R/W) Apply to Intel Xeon processor
+    /// 7400 series (processor signature  06_1D) only. See Section 17.2.2
     pub const MSR_EMON_L3_CTR_CTL6: Self = Self(0x107d2);
 
-    /// IFSB Latency Event Control Register  (R/W) See Section 18.17, Performance  Monitoring on 64-bit Intel Xeon Processor MP with Up to 8-MByte L3 Cache  for  details.
+    /// IFSB Latency Event Control Register  (R/W) See Section 18.17,
+    /// Performance  Monitoring on 64-bit Intel Xeon Processor MP with Up to
+    /// 8-MByte L3 Cache  for  details.
     pub const MSR_IFSB_CTL6: Self = Self(0x107d2);
 
-    /// FSB Event Control/Counter Register (R/W) Apply to Intel Xeon processor 7400 series (processor signature  06_1D) only. See Section 17.2.2
+    /// FSB Event Control/Counter Register (R/W) Apply to Intel Xeon processor
+    /// 7400 series (processor signature  06_1D) only. See Section 17.2.2
     pub const MSR_EMON_L3_CTR_CTL7: Self = Self(0x107d3);
 
-    /// IFSB Latency Event Counter Register  (R/W)  See Section 18.17, Performance  Monitoring on 64-bit Intel Xeon Processor  MP with Up to 8-MByte L3 Cache.
+    /// IFSB Latency Event Counter Register  (R/W)  See Section 18.17,
+    /// Performance  Monitoring on 64-bit Intel Xeon Processor  MP with Up to
+    /// 8-MByte L3 Cache.
     pub const MSR_IFSB_CNTR7: Self = Self(0x107d3);
 
-    /// L3/FSB Common Control Register (R/W) Apply to Intel Xeon processor 7400 series (processor signature  06_1D) only. See Section 17.2.2
+    /// L3/FSB Common Control Register (R/W) Apply to Intel Xeon processor 7400
+    /// series (processor signature  06_1D) only. See Section 17.2.2
     pub const MSR_EMON_L3_GL_CTL: Self = Self(0x107d8);
 
     /// If (  CPUID.80000001.EDX.\[bit  20\] or  CPUID.80000001.EDX.\[bit 29\])
@@ -3246,6 +3523,7 @@ impl MSR {
     /// Swap Target of BASE Address of GS (R/W) See Table 35-2.
     pub const IA32_KERNEL_GSBASE: Self = Self(0xc0000102);
 
-    /// AUXILIARY TSC Signature. (R/W) See Table 35-2 and Section  17.13.2, IA32_TSC_AUX Register and RDTSCP Support.
+    /// AUXILIARY TSC Signature. (R/W) See Table 35-2 and Section  17.13.2,
+    /// IA32_TSC_AUX Register and RDTSCP Support.
     pub const IA32_TSC_AUX: Self = Self(0xc0000103);
 }
