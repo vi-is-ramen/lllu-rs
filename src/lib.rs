@@ -7,3 +7,4 @@ macro_rules!ins_mod{($mv:vis$m:ident as$iv:vis)=>{$mv mod$m;$iv use$m::*;};($mv:
 pub mod ins;
 pub mod reg;
 pub mod tab;
+pub mod util;

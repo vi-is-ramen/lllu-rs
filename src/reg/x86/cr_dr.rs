@@ -140,7 +140,6 @@ macro_rules! impl_mov_reg {
                     core::arch::asm!(
                         $read_asm,
                         out(reg) ret,
-                        options(att_syntax),
                     );
                 }
                 ret
@@ -151,7 +150,6 @@ macro_rules! impl_mov_reg {
                     core::arch::asm!(
                         $write_asm,
                         in(reg) value,
-                        options(att_syntax),
                     );
                 }
             }
@@ -234,30 +232,30 @@ impl super::Register<{ size_of::<usize>() }> for Cr1
 // Control registers
 // ------------------------------------------------------------------
 
-impl_mov_reg!(Cr0, Cr0Value, "mov %cr0, {0}", "mov {0}, %cr0");
-impl_mov_reg!(Cr2, Cr2Value, "mov %cr2, {0}", "mov {0}, %cr2");
-impl_mov_reg!(Cr3, Cr3Value, "mov %cr3, {0}", "mov {0}, %cr3");
-impl_mov_reg!(Cr4, Cr4Value, "mov %cr4, {0}", "mov {0}, %cr4");
+impl_mov_reg!(Cr0, Cr0Value, "mov {0}, cr0", "mov cr0, {0}");
+impl_mov_reg!(Cr2, Cr2Value, "mov {0}, cr2", "mov cr2, {0}");
+impl_mov_reg!(Cr3, Cr3Value, "mov {0}, cr3", "mov cr3, {0}");
+impl_mov_reg!(Cr4, Cr4Value, "mov {0}, cr4", "mov cr4, {0}");
 
 // CR8 is only available in 64-bit mode.
 #[cfg(target_arch = "x86_64")]
-impl_mov_reg!(Cr8, Cr8Value, "mov %cr8, {0}", "mov {0}, %cr8");
+impl_mov_reg!(Cr8, Cr8Value, "mov {0}, cr8", "mov cr8, {0}");
 
 // ------------------------------------------------------------------
 // Debug registers
 // ------------------------------------------------------------------
 
-impl_mov_reg!(Dr0, Dr0Value, "mov %db0, {0}", "mov {0}, %db0");
-impl_mov_reg!(Dr1, Dr1Value, "mov %db1, {0}", "mov {0}, %db1");
-impl_mov_reg!(Dr2, Dr2Value, "mov %db2, {0}", "mov {0}, %db2");
-impl_mov_reg!(Dr3, Dr3Value, "mov %db3, {0}", "mov {0}, %db3");
+impl_mov_reg!(Dr0, Dr0Value, "mov {0}, db0", "mov db0, {0}");
+impl_mov_reg!(Dr1, Dr1Value, "mov {0}, db1", "mov db1, {0}");
+impl_mov_reg!(Dr2, Dr2Value, "mov {0}, db2", "mov db2, {0}");
+impl_mov_reg!(Dr3, Dr3Value, "mov {0}, db3", "mov db3, {0}");
 
 // DR4/DR5 are conditional/aliased depending on CR4.DE.
-impl_mov_reg!(Dr4, Dr4Value, "mov %db4, {0}", "mov {0}, %db4");
-impl_mov_reg!(Dr5, Dr5Value, "mov %db5, {0}", "mov {0}, %db5");
+impl_mov_reg!(Dr4, Dr4Value, "mov {0}, db4", "mov db4, {0}");
+impl_mov_reg!(Dr5, Dr5Value, "mov {0}, db5", "mov db5, {0}");
 
-impl_mov_reg!(Dr6, Dr6Value, "mov %db6, {0}", "mov {0}, %db6");
-impl_mov_reg!(Dr7, Dr7Value, "mov %db7, {0}", "mov {0}, %db7");
+impl_mov_reg!(Dr6, Dr6Value, "mov {0}, db6", "mov db6, {0}");
+impl_mov_reg!(Dr7, Dr7Value, "mov {0}, db7", "mov db7, {0}");
 
 // ------------------------------------------------------------------
 // Control registers manipulation

@@ -128,7 +128,6 @@ macro_rules! impl_seg_reg {
                     core::arch::asm!(
                         $read_asm,
                         out(reg) ret,
-                        options(att_syntax),
                     );
                 }
                 ret
@@ -139,7 +138,6 @@ macro_rules! impl_seg_reg {
                     core::arch::asm!(
                         $write_asm,
                         in(reg) value,
-                        options(att_syntax),
                     );
                 }
             }
@@ -195,9 +193,8 @@ impl super::Register<2> for Cs
         let ret: u16;
         unsafe {
             core::arch::asm!(
-                "mov %cs, {0:x}",
+                "mov {0:x}, cs",
                 out(reg) ret,
-                options(att_syntax),
             );
         }
         ret
@@ -227,8 +224,8 @@ impl super::Register<2> for Cs
 // Data / Stack / Extra Segments
 // ------------------------------------------------------------------
 
-impl_seg_reg!(Ds, Segment, "mov %ds, {0:x}", "mov {0:x}, %ds");
-impl_seg_reg!(Ss, Segment, "mov %ss, {0:x}", "mov {0:x}, %ss");
-impl_seg_reg!(Es, Segment, "mov %es, {0:x}", "mov {0:x}, %es");
-impl_seg_reg!(Fs, Segment, "mov %fs, {0:x}", "mov {0:x}, %fs");
-impl_seg_reg!(Gs, Segment, "mov %gs, {0:x}", "mov {0:x}, %gs");
+impl_seg_reg!(Ds, Segment, "mov {0:x}, ds", "mov ds, {0:x}");
+impl_seg_reg!(Ss, Segment, "mov {0:x}, ss", "mov ss, {0:x}");
+impl_seg_reg!(Es, Segment, "mov {0:x}, es", "mov es, {0:x}");
+impl_seg_reg!(Fs, Segment, "mov {0:x}, fs", "mov fs, {0:x}");
+impl_seg_reg!(Gs, Segment, "mov {0:x}, gs", "mov gs, {0:x}");

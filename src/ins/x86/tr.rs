@@ -10,7 +10,7 @@ pub unsafe fn str() -> Segment
     unsafe {
         core::arch::asm!("str {0:x}",
         out(reg) segment,
-        options(att_syntax, nostack, nomem, preserves_flags));
+        options(nostack, nomem, preserves_flags));
     }
     segment.into()
 }
@@ -24,6 +24,6 @@ pub unsafe fn ltr(sel: Segment)
     unsafe {
         core::arch::asm!("ltr {0:x}",
         in(reg) u16::from(sel),
-        options(att_syntax, nostack, nomem, preserves_flags));
+        options(nostack, nomem, preserves_flags));
     }
 }
