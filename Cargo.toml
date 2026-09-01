@@ -1,0 +1,10 @@
+[package]
+name = "lllu"
+version = "0.0.0"
+edition = "2024"
+description = "Low-level language utilities"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/vi-is-ramen/lllu-rs"
+homepage = "https://github.com/vi-is-ramen/lllu-rs"
+
+[dependencies]
