@@ -4,20 +4,33 @@ where
     T: Copy + Sized,
     usize: From<T>,
 {
+    const {
+        if core::mem::size_of::<T>() != 1
+            && core::mem::size_of::<T>() != 2
+            && core::mem::size_of::<T>() != 4
+        {
+            panic!("T must be 1, 2, or 4 bytes");
+        }
+    }
     unsafe {
-        if core::mem::size_of::<T>() == 1 {
+        if core::mem::size_of::<T>() == 1
+        {
             core::arch::asm! {
                 "out dx, al",
                 in("al") usize::from(value) as u8,
                 in("dx") port,
             }
-        } else if core::mem::size_of::<T>() == 2 {
+        }
+        else if core::mem::size_of::<T>() == 2
+        {
             core::arch::asm! {
                 "out dx, ax",
                 in("ax") usize::from(value) as u16,
                 in("dx") port,
             }
-        } else if core::mem::size_of::<T>() == 4 {
+        }
+        else if core::mem::size_of::<T>() == 4
+        {
             core::arch::asm! {
                 "out dx, eax",
                 in("eax") usize::from(value) as u32,
@@ -33,9 +46,18 @@ where
     T: Copy + Sized,
     T: From<usize>,
 {
+    const {
+        if core::mem::size_of::<T>() != 1
+            && core::mem::size_of::<T>() != 2
+            && core::mem::size_of::<T>() != 4
+        {
+            panic!("T must be 1, 2, or 4 bytes");
+        }
+    }
     let mut value = core::mem::MaybeUninit::<T>::uninit();
     unsafe {
-        if core::mem::size_of::<T>() == 1 {
+        if core::mem::size_of::<T>() == 1
+        {
             let mut reg_al: u8;
             core::arch::asm! {
                 "in al, dx",
@@ -43,7 +65,9 @@ where
                 in("dx") port,
             }
             core::ptr::write(value.as_mut_ptr() as *mut u8, reg_al);
-        } else if core::mem::size_of::<T>() == 2 {
+        }
+        else if core::mem::size_of::<T>() == 2
+        {
             let mut reg_ax: u16;
             core::arch::asm! {
                 "in ax, dx",
@@ -51,7 +75,9 @@ where
                 in("dx") port,
             }
             core::ptr::write(value.as_mut_ptr() as *mut u16, reg_ax);
-        } else if core::mem::size_of::<T>() == 4 {
+        }
+        else if core::mem::size_of::<T>() == 4
+        {
             let mut reg_eax: u32;
             core::arch::asm! {
                 "in eax, dx",
