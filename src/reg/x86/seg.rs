@@ -2,75 +2,94 @@ use crate::reg::Cast as _;
 
 macro_rules! impl_seg_value {
     ($val:ident) => {
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash)]
-        pub struct $val {
+        #[derive(
+            Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash,
+        )]
+        pub struct $val
+        {
             pub raw: u16,
         }
 
-        impl From<u16> for $val {
-            fn from(raw: u16) -> Self {
+        impl From<u16> for $val
+        {
+            fn from(raw: u16) -> Self
+            {
                 Self { raw }
             }
         }
 
-        impl From<$val> for u16 {
-            fn from(value: $val) -> Self {
+        impl From<$val> for u16
+        {
+            fn from(value: $val) -> Self
+            {
                 value.raw
             }
         }
 
-        impl $val {
-            pub const fn new(raw: u16) -> Self {
+        impl $val
+        {
+            pub const fn new(raw: u16) -> Self
+            {
                 Self { raw }
             }
         }
 
-        impl $val {
+        impl $val
+        {
             /// Requested Privilege Level (bits 0-1)
-            pub const fn rpl(self) -> u8 {
+            pub const fn rpl(self) -> u8
+            {
                 (self.raw & 0x3) as u8
             }
 
-            pub const fn with_rpl(self, rpl: u8) -> Self {
+            pub const fn with_rpl(self, rpl: u8) -> Self
+            {
                 Self {
                     raw: (self.raw & !0x3) | ((rpl as u16) & 0x3),
                 }
             }
 
-            pub const fn gdt(self) -> bool {
+            pub const fn gdt(self) -> bool
+            {
                 (self.raw & (1 << 2)) == 0
             }
 
-            pub const fn ldt(self) -> bool {
+            pub const fn ldt(self) -> bool
+            {
                 (self.raw & (1 << 2)) != 0
             }
 
-            pub const fn with_gdt(self) -> Self {
+            pub const fn with_gdt(self) -> Self
+            {
                 Self {
                     raw: self.raw & !(1 << 2),
                 }
             }
 
-            pub const fn with_ldt(self) -> Self {
+            pub const fn with_ldt(self) -> Self
+            {
                 Self {
                     raw: self.raw | (1 << 2),
                 }
             }
 
             /// Segment Index (bits 3-15)
-            pub const fn index(self) -> u16 {
+            pub const fn index(self) -> u16
+            {
                 self.raw >> 3
             }
 
-            pub const fn with_index(self, index: u16) -> Self {
+            pub const fn with_index(self, index: u16) -> Self
+            {
                 Self {
                     raw: (self.raw & 0x7) | (index << 3),
                 }
             }
 
-            /// Returns true if the selector points to the null descriptor (index 0, GDT).
-            /// Note: RPL is ignored when checking for null.
-            pub const fn is_null(self) -> bool {
+            /// Returns true if the selector points to the null descriptor
+            /// (index 0, GDT). Note: RPL is ignored when checking for null.
+            pub const fn is_null(self) -> bool
+            {
                 self.raw & !0x3 == 0
             }
         }
@@ -145,27 +164,34 @@ impl_seg_value!(Segment);
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash)]
 pub struct Cs;
 
-impl super::Register<2> for Cs {
+impl super::Register<2> for Cs
+{
     type Inner = u16;
 
-    unsafe fn try_read(&self) -> Option<Self::Inner> {
+    unsafe fn try_read(&self) -> Option<Self::Inner>
+    {
         Some(unsafe { self.read() })
     }
 
-    unsafe fn try_write(&mut self, _value: Self::Inner) -> Option<()> {
-        // Writing to CS directly via MOV is architecturally illegal and causes #UD.
+    unsafe fn try_write(&mut self, _value: Self::Inner) -> Option<()>
+    {
+        // Writing to CS directly via MOV is architecturally illegal and causes
+        // #UD.
         None
     }
 
-    unsafe fn try_read_raw(&self) -> Option<[u8; 2]> {
+    unsafe fn try_read_raw(&self) -> Option<[u8; 2]>
+    {
         Some(unsafe { self.read() }.cast())
     }
 
-    unsafe fn try_write_raw(&mut self, _value: [u8; 2]) -> Option<()> {
+    unsafe fn try_write_raw(&mut self, _value: [u8; 2]) -> Option<()>
+    {
         None
     }
 
-    unsafe fn read(&self) -> Self::Inner {
+    unsafe fn read(&self) -> Self::Inner
+    {
         let ret: u16;
         unsafe {
             core::arch::asm!(
@@ -177,16 +203,23 @@ impl super::Register<2> for Cs {
         ret
     }
 
-    unsafe fn write(&mut self, _value: Self::Inner) {
-        panic!("Cannot write to CS directly. Use a far jump, far call, or iret.");
+    unsafe fn write(&mut self, _value: Self::Inner)
+    {
+        panic!(
+            "Cannot write to CS directly. Use a far jump, far call, or iret."
+        );
     }
 
-    unsafe fn read_raw(&self) -> [u8; 2] {
+    unsafe fn read_raw(&self) -> [u8; 2]
+    {
         unsafe { self.read() }.cast()
     }
 
-    unsafe fn write_raw(&mut self, _value: [u8; 2]) {
-        panic!("Cannot write to CS directly. Use a far jump, far call, or iret.");
+    unsafe fn write_raw(&mut self, _value: [u8; 2])
+    {
+        panic!(
+            "Cannot write to CS directly. Use a far jump, far call, or iret."
+        );
     }
 }
 

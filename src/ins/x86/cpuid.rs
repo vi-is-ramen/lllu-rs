@@ -1,5 +1,6 @@
 #[derive(Copy, Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct CpuidResult {
+pub struct CpuidResult
+{
     pub eax: u32,
     pub ebx: u32,
     pub ecx: u32,
@@ -7,9 +8,11 @@ pub struct CpuidResult {
 }
 
 #[inline(always)]
-pub fn cpuid_count(leaf: u32, sub_leaf: u32) -> CpuidResult {
-    if cfg!(target_env = "sgx") {
-        panic!("`__cpuid` cannot be used in SGX");
+pub fn cpuid_count(leaf: u32, sub_leaf: u32) -> CpuidResult
+{
+    if cfg!(target_env = "sgx")
+    {
+        panic!("`cpuid` cannot be used in SGX");
     }
 
     let eax;
@@ -51,6 +54,7 @@ pub fn cpuid_count(leaf: u32, sub_leaf: u32) -> CpuidResult {
 /// Calls CPUID with the provided `leaf` value, with `sub_leaf` set to 0.
 /// See [`cpuid_count`].
 #[inline(always)]
-pub fn cpuid(leaf: u32) -> CpuidResult {
+pub fn cpuid(leaf: u32) -> CpuidResult
+{
     cpuid_count(leaf, 0)
 }

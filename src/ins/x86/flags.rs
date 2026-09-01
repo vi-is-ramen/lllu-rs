@@ -1,47 +1,54 @@
 #[inline(always)]
-pub fn cli() {
+pub fn cli()
+{
     unsafe {
         core::arch::asm! { "cli", options(nomem, nostack) }
     }
 }
 
 #[inline(always)]
-pub fn sti() {
+pub fn sti()
+{
     unsafe {
         core::arch::asm! { "sti", options(nomem, nostack) }
     }
 }
 
 #[inline(always)]
-pub fn clc() {
+pub fn clc()
+{
     unsafe {
         core::arch::asm! { "clc", options(nomem, nostack) }
     }
 }
 
 #[inline(always)]
-pub fn stc() {
+pub fn stc()
+{
     unsafe {
         core::arch::asm! { "stc", options(nomem, nostack) }
     }
 }
 
 #[inline(always)]
-pub fn cld() {
+pub fn cld()
+{
     unsafe {
         core::arch::asm! { "cld", options(nomem, nostack) }
     }
 }
 
 #[inline(always)]
-pub fn std() {
+pub fn std()
+{
     unsafe {
         core::arch::asm! { "std", options(nomem, nostack) }
     }
 }
 
 #[inline(always)]
-pub fn ckc() -> bool {
+pub fn ckc() -> bool
+{
     unsafe {
         core::arch::asm! {
             "jc {}",
@@ -54,7 +61,8 @@ pub fn ckc() -> bool {
 }
 
 #[inline(always)]
-pub fn ckz() -> bool {
+pub fn ckz() -> bool
+{
     unsafe {
         core::arch::asm! {
             "jz {}",
@@ -67,7 +75,8 @@ pub fn ckz() -> bool {
 }
 
 #[inline(always)]
-pub fn cks() -> bool {
+pub fn cks() -> bool
+{
     unsafe {
         core::arch::asm! {
             "js {}",

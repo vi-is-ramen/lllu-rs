@@ -1,26 +1,33 @@
 macro_rules! impl_cast_int {
     ($int:ty) => {
-        impl Cast<$int> for [u8; const { size_of::<$int>() }] {
-            fn cast(self) -> $int {
+        impl Cast<$int> for [u8; const { size_of::<$int>() }]
+        {
+            fn cast(self) -> $int
+            {
                 <$int>::from_le_bytes(self)
             }
         }
 
-        impl Cast<[u8; const { size_of::<$int>() }]> for $int {
-            fn cast(self) -> [u8; const { size_of::<$int>() }] {
+        impl Cast<[u8; const { size_of::<$int>() }]> for $int
+        {
+            fn cast(self) -> [u8; const { size_of::<$int>() }]
+            {
                 self.to_le_bytes()
             }
         }
     };
 }
 
-pub trait Cast<U> {
+pub trait Cast<U>
+{
     fn cast(self) -> U;
 }
 
-impl<T> Cast<T> for T {
+impl<T> Cast<T> for T
+{
     // for cases where Self is already the target type
-    fn cast(self) -> T {
+    fn cast(self) -> T
+    {
         self
     }
 }
@@ -33,8 +40,7 @@ impl_cast_int!(u128);
 impl_cast_int!(usize);
 
 pub trait Register<const SIZEOF: usize>
-where
-    Self::Inner: Sized + Cast<[u8; SIZEOF]>,
+where Self::Inner: Sized + Cast<[u8; SIZEOF]>
 {
     type Inner;
 

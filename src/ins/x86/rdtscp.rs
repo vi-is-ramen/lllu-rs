@@ -1,10 +1,12 @@
-pub struct Rdtscp {
+pub struct Rdtscp
+{
     pub ticks: u64,
-    pub aux: u32,
+    pub aux:   u32,
 }
 
 #[inline(always)]
-pub unsafe fn rdtscp() -> Rdtscp {
+pub unsafe fn rdtscp() -> Rdtscp
+{
     let lo: u32;
     let hi: u32;
     let aux: u32;

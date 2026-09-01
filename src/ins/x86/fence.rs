@@ -2,7 +2,8 @@
 ///
 /// Performs a serializing operation on all load-from-memory and store-to-memory
 /// instructions that were issued prior the MFENCE instruction.
-pub fn mfence() {
+pub fn mfence()
+{
     unsafe { core::arch::asm!("mfence") };
 }
 
@@ -11,7 +12,8 @@ pub fn mfence() {
 /// Orders processor execution relative to all memory stores prior to the SFENCE
 /// instruction. The processor ensures that every store prior to SFENCE is
 /// globally visible before any store after SFENCE becomes globally visible.
-pub fn sfence() {
+pub fn sfence()
+{
     unsafe { core::arch::asm!("sfence") };
 }
 
@@ -21,6 +23,7 @@ pub fn sfence() {
 /// were issued prior the LFENCE instruction. Specifically, LFENCE does not
 /// execute until all prior instructions have completed locally, and no later
 /// instruction begins execution until LFENCE completes.
-pub fn lfence() {
+pub fn lfence()
+{
     unsafe { core::arch::asm!("lfence") };
 }

@@ -1,5 +1,6 @@
 #[inline(always)]
-pub unsafe fn rdtsc() -> u64 {
+pub unsafe fn rdtsc() -> u64
+{
     let lo: u32;
     let hi: u32;
     unsafe {

@@ -1,5 +1,6 @@
 #[inline(always)]
-pub unsafe fn hlt() -> ! {
+pub unsafe fn hlt() -> !
+{
     unsafe {
         core::arch::asm!(
             "hlt",
