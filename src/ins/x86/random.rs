@@ -42,15 +42,18 @@ pub unsafe fn rdrand64(e: &mut u64) -> bool
 
 /// Generates a 64-bit random value and stores it in `e`.
 ///
+/// This function uses the RDSEED instruction twice to generate two 32-bit
+/// halves of the 64-bit value. First result is low half, second is high.
+///
 /// # Safety
 /// Will crash if RDRAND instructions are not supported.
 #[cfg(target_arch = "x86")]
 #[inline]
 pub unsafe fn rdrand64(e: &mut u64) -> bool
 {
-    let (a, b): (u32, u32);
-    unsafe { _rdrand32_step(a) == 1 };
-    let ret = unsafe { _rdrand32_step(b) == 1 };
+    let (mut a, mut b): (u32, u32);
+    unsafe { _rdrand32_step(&mut a) == 1 };
+    let ret = unsafe { _rdrand32_step(&mut b) == 1 };
     e = a & (b << 32);
     ret
 }
@@ -59,7 +62,7 @@ pub unsafe fn rdrand64(e: &mut u64) -> bool
 pub trait RdRand
 {
     /// Fills `self` with random bits. Returns true on success or false
-    /// otherwise
+    /// otherwise.
     ///
     /// # Safety
     /// RDRAND is not supported on all architectures, so using this may crash
@@ -69,7 +72,7 @@ pub trait RdRand
 
 impl RdRand for u8
 {
-    /// Fills the 16-bit value with a random bit string
+    /// Fills the 16-bit value with a random bit string.
     ///
     /// # Safety
     /// Will crash if RDSEED instructions are not supported.
@@ -84,7 +87,7 @@ impl RdRand for u8
 
 impl RdRand for u16
 {
-    /// Fills the 16-bit value with a random bit string
+    /// Fills the 16-bit value with a random bit string.
     ///
     /// # Safety
     /// Will crash if RDRAND instructions are not supported.
@@ -96,7 +99,7 @@ impl RdRand for u16
 
 impl RdRand for u32
 {
-    /// Fills the 32-bit value with a random bit string
+    /// Fills the 32-bit value with a random bit string.
     ///
     /// # Safety
     /// Will crash if RDRAND instructions are not supported.
@@ -106,10 +109,12 @@ impl RdRand for u32
     }
 }
 
-#[cfg(target_arch = "x86_64")]
 impl RdRand for u64
 {
-    /// Fills the 64-bit value with a random bit string
+    /// Fills the 64-bit value with a random bit string.
+    ///
+    /// This function uses the RDSEED instruction twice to generate two 32-bit
+    /// halves of the 64-bit value. First result is low half, second is high.
     ///
     /// # Safety
     /// Will crash if RDRAND instructions are not supported.
@@ -122,7 +127,7 @@ impl RdRand for u64
 impl<T> RdRand for [T]
 where T: RdRand
 {
-    /// Fills the 64-bit value with a random bit string
+    /// Fills the 64-bit value with a random bit string.
     ///
     /// # Safety
     /// Will crash if RDRAND instructions are not supported.
@@ -140,7 +145,7 @@ where T: RdRand
 impl<T, const N: usize> RdRand for [T; N]
 where T: RdRand
 {
-    /// Fills the 64-bit value with a random bit string
+    /// Fills the 64-bit value with a random bit string.
     ///
     /// # Safety
     /// Will crash if RDRAND instructions are not supported.
@@ -188,15 +193,18 @@ pub unsafe fn rdseed64(e: &mut u64) -> bool
 
 /// Generates a 64-bit random value and stores it in `e`.
 ///
+/// This function uses the RDSEED instruction twice to generate two 32-bit
+/// halves of the 64-bit value. First result is low half, second is high.
+///
 /// # Safety
 /// Will crash if RDSEED instructions are not supported.
 #[cfg(target_arch = "x86")]
 #[inline]
 pub unsafe fn rdseed64(e: &mut u64) -> bool
 {
-    let (a, b): (u32, u32);
-    unsafe { _rdseed32_step(a) == 1 };
-    let ret = unsafe { _rdseed32_step(b) == 1 };
+    let (mut a, mut b): (u32, u32);
+    unsafe { _rdseed32_step(&mut a) == 1 };
+    let ret = unsafe { _rdseed32_step(&mut b) == 1 };
     e = a & (b << 32);
     ret
 }
@@ -205,7 +213,7 @@ pub unsafe fn rdseed64(e: &mut u64) -> bool
 pub trait RdSeed
 {
     /// Fills `self` with random bits. Returns true on success or false
-    /// otherwise
+    /// otherwise.
     ///
     /// # Safety
     /// RDSEED is not supported on all architectures, so using this may crash
@@ -215,7 +223,7 @@ pub trait RdSeed
 
 impl RdSeed for u8
 {
-    /// Fills the 16-bit value with a random bit string
+    /// Fills the 16-bit value with a random bit string.
     ///
     /// # Safety
     /// Will crash if RDSEED instructions are not supported.
@@ -230,7 +238,7 @@ impl RdSeed for u8
 
 impl RdSeed for u16
 {
-    /// Fills the 16-bit value with a random bit string
+    /// Fills the 16-bit value with a random bit string.
     ///
     /// # Safety
     /// Will crash if RDSEED instructions are not supported.
@@ -242,7 +250,7 @@ impl RdSeed for u16
 
 impl RdSeed for u32
 {
-    /// Fills the 32-bit value with a random bit string
+    /// Fills the 32-bit value with a random bit string.
     ///
     /// # Safety
     /// Will crash if RDSEED instructions are not supported.
@@ -252,10 +260,12 @@ impl RdSeed for u32
     }
 }
 
-#[cfg(target_arch = "x86_64")]
 impl RdSeed for u64
 {
-    /// Fills the 64-bit value with a random bit string
+    /// Fills the 64-bit value with a random bit string.
+    ///
+    /// This function uses the RDSEED instruction twice to generate two 32-bit
+    /// halves of the 64-bit value. First result is low half, second is high.
     ///
     /// # Safety
     /// Will crash if RDSEED instructions are not supported.
@@ -268,7 +278,7 @@ impl RdSeed for u64
 impl<T> RdSeed for [T]
 where T: RdSeed
 {
-    /// Fills the 64-bit value with a random bit string
+    /// Fills the 64-bit value with a random bit string.
     ///
     /// # Safety
     /// Will crash if RDSEED instructions are not supported.
@@ -286,7 +296,7 @@ where T: RdSeed
 impl<T, const N: usize> RdSeed for [T; N]
 where T: RdSeed
 {
-    /// Fills the 64-bit value with a random bit string
+    /// Fills the 64-bit value with a random bit string.
     ///
     /// # Safety
     /// Will crash if RDSEED instructions are not supported.
