@@ -67,3 +67,5 @@ where T: Table
         unsafe { (self.base as *mut T).as_mut_unchecked() }
     }
 }
+
+ins_mod!(irq as pub);
