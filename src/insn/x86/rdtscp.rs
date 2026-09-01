@@ -3,17 +3,12 @@ pub struct Rdtscp {
     pub aux: u32,
 }
 
-impl From<(u64, u32)> for Rdtscp {
-    fn from((ticks, aux): (u64, u32)) -> Self {
-        Self { ticks, aux }
-    }
-}
-
-#[inline]
+#[inline(always)]
 pub unsafe fn rdtscp() -> Rdtscp {
     let lo: u32;
     let hi: u32;
     let aux: u32;
+
     unsafe {
         core::arch::asm! {
             "rdtscp",
@@ -23,5 +18,9 @@ pub unsafe fn rdtscp() -> Rdtscp {
             options(nomem, nostack, preserves_flags),
         }
     }
-    (((hi as u64) << 32) | (lo as u64), aux).into()
+
+    Rdtscp {
+        ticks: ((hi as u64) << 32) | (lo as u64),
+        aux,
+    }
 }

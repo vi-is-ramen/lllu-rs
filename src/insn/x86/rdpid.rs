@@ -1,4 +1,4 @@
-#[inline]
+#[inline(always)]
 pub unsafe fn rdpid() -> u32 {
     let aux: u32;
     unsafe {

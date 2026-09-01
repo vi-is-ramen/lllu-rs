@@ -6,7 +6,7 @@ pub struct CpuidResult {
     pub edx: u32,
 }
 
-#[inline]
+#[inline(always)]
 pub fn cpuid_count(leaf: u32, sub_leaf: u32) -> CpuidResult {
     if cfg!(target_env = "sgx") {
         panic!("`__cpuid` cannot be used in SGX");
@@ -50,7 +50,7 @@ pub fn cpuid_count(leaf: u32, sub_leaf: u32) -> CpuidResult {
 
 /// Calls CPUID with the provided `leaf` value, with `sub_leaf` set to 0.
 /// See [`cpuid_count`].
-#[inline]
+#[inline(always)]
 pub fn cpuid(leaf: u32) -> CpuidResult {
     cpuid_count(leaf, 0)
 }
