@@ -41,3 +41,19 @@ where
     };
     ret
 }
+
+#[inline(always)]
+pub unsafe fn lldt(selector: crate::reg::Segment) {
+    unsafe {
+        core::arch::asm!("lldt {0:x}", in(reg) u16::from(selector));
+    }
+}
+
+#[inline(always)]
+pub unsafe fn sldt() -> crate::reg::Segment {
+    let selector: u16;
+    unsafe {
+        core::arch::asm!("sldt {0:x}", out(reg) selector);
+    }
+    crate::reg::Segment::from(selector)
+}

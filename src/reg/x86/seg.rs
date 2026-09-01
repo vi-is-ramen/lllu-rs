@@ -23,7 +23,9 @@ macro_rules! impl_seg_value {
             pub const fn new(raw: u16) -> Self {
                 Self { raw }
             }
+        }
 
+        impl $val {
             /// Requested Privilege Level (bits 0-1)
             pub const fn rpl(self) -> u8 {
                 (self.raw & 0x3) as u8
@@ -79,8 +81,6 @@ macro_rules! impl_seg_reg {
     ($reg:ident, $val:ident, $read_asm:literal, $write_asm:literal) => {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash)]
         pub struct $reg;
-
-        impl_seg_value!($val);
 
         impl super::Register<2> for $reg {
             type Inner = u16;
@@ -140,7 +140,7 @@ macro_rules! impl_seg_reg {
 // Code Segment (CS)
 // ------------------------------------------------------------------
 
-impl_seg_value!(CsValue);
+impl_seg_value!(Segment);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default, Hash)]
 pub struct Cs;
@@ -194,8 +194,8 @@ impl super::Register<2> for Cs {
 // Data / Stack / Extra Segments
 // ------------------------------------------------------------------
 
-impl_seg_reg!(Ds, DsValue, "mov %ds, {0:x}", "mov {0:x}, %ds");
-impl_seg_reg!(Ss, SsValue, "mov %ss, {0:x}", "mov {0:x}, %ss");
-impl_seg_reg!(Es, EsValue, "mov %es, {0:x}", "mov {0:x}, %es");
-impl_seg_reg!(Fs, FsValue, "mov %fs, {0:x}", "mov {0:x}, %fs");
-impl_seg_reg!(Gs, GsValue, "mov %gs, {0:x}", "mov {0:x}, %gs");
+impl_seg_reg!(Ds, Segment, "mov %ds, {0:x}", "mov {0:x}, %ds");
+impl_seg_reg!(Ss, Segment, "mov %ss, {0:x}", "mov {0:x}, %ss");
+impl_seg_reg!(Es, Segment, "mov %es, {0:x}", "mov {0:x}, %es");
+impl_seg_reg!(Fs, Segment, "mov %fs, {0:x}", "mov {0:x}, %fs");
+impl_seg_reg!(Gs, Segment, "mov %gs, {0:x}", "mov {0:x}, %gs");
