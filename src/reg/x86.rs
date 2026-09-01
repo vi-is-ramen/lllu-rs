@@ -59,3 +59,4 @@ ins_mod!(msr as pub);
 ins_mod!(cr_dr as pub);
 ins_mod!(flags as pub);
 ins_mod!(xcr0 as pub);
+ins_mod!(seg as pub);
