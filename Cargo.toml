@@ -8,4 +8,3 @@ repository = "https://github.com/vi-is-ramen/lllu-rs"
 homepage = "https://github.com/vi-is-ramen/lllu-rs"
 
 [dependencies]
-hlt = "0.1.1"

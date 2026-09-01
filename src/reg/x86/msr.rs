@@ -29,12 +29,12 @@ where
     type Inner = u64;
 
     unsafe fn read(&self) -> Self::Inner {
-        unsafe { crate::insn::rdmsr(self.id()) }
+        unsafe { crate::ins::rdmsr(self.id()) }
     }
 
     unsafe fn write(&mut self, value: Self::Inner) {
         unsafe {
-            crate::insn::wrmsr(self.id(), value);
+            crate::ins::wrmsr(self.id(), value);
         }
     }
 
